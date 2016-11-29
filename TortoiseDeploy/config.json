@@ -1,0 +1,7 @@
+﻿{
+  "MergeToolPath": "C:\\Program Files (x86)\\Beyond Compare 4\\BCompare.exe",
+  "DeploymentMap": {
+    "*": "C:\\Users\\mitch\\Desktop\\TortoiseDeploy-Deploy"
+  },
+  "RepositoryRoot": "C:\\Users\\mitch\\Desktop\\TortoiseDeploy\\testing"
+}

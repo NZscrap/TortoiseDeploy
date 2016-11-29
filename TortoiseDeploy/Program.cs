@@ -109,6 +109,46 @@ namespace TortoiseDeploy {
 				}
 			}
 
+			// Load up our config file
+			string configFilePath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "config.json");
+			output.AppendLine("Loading config from: " + configFilePath);
+			Config config;
+			using (StreamReader reader = new StreamReader(configFilePath)) {
+				config = JsonConvert.DeserializeObject<Config>(reader.ReadToEnd());
+			}
+
+			// Loop through each file, and launch the merge tool
+			foreach(string changedFile in changedFiles) {
+				string target = config.GetDeploymentFolder(changedFile) + Path.GetFileName(changedFile);
+
+				// Lets launch our diff tool!
+				string diffArguments = changedFile + " " + target;
+				Process diffTool = System.Diagnostics.Process.Start(config.MergeToolPath, diffArguments);
+				diffTool.WaitForExit();
+
+				// Prompt the user as to whether we should copy the file
+				string prompt = String.Format("\nDeploy {0} to {1} this file?\n[Y]es, [N]o, [C]hange destination, [A]bort:", changedFile, target);
+				Console.Write(prompt);
+				string response = Console.ReadKey().KeyChar.ToString().ToLower();
+
+				// Add the user prompt to the log
+				output.Append(prompt);
+				output.Append(response);
+
+				// Handle the user input
+				if (response == "y") {
+					// Copy the file!
+					try {
+						File.Copy(changedFile, target, true);
+					} catch (Exception ex) {
+						output.AppendLine(String.Format("Error copying {0} to {1}:\n{2}", changedFile, target, ex.ToString()));
+						Console.WriteLine("ERROR - Failed to copy file. You will need to manually deploy.");
+					}
+				} else if (response == "a") {
+					break;
+				}
+			}
+
 			return output.ToString();
 		}
 	}
