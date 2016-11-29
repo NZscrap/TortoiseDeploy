@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Linq;
 
 namespace TortoiseDeploy {
 	class Program {
@@ -127,29 +128,60 @@ namespace TortoiseDeploy {
 				diffTool.WaitForExit();
 
 				// Prompt the user as to whether we should copy the file
-				string prompt = String.Format("\nDeploy {0} to {1} this file?\n[Y]es, [N]o, [C]hange destination, [A]bort:", changedFile, target);
-				Console.Write(prompt);
-				string response = Console.ReadKey().KeyChar.ToString().ToLower();
+				string prompt = String.Format("\nDeploy {0} to {1} this file?\n[Y]es, [N]o, [C]hange destination:", changedFile, target);
+				string response = PromptUser(prompt, new string[] { "y", "n", "c", "a" });
 
 				// Add the user prompt to the log
 				output.Append(prompt);
 				output.Append(response);
 
 				// Handle the user input
-				if (response == "y") {
-					// Copy the file!
-					try {
-						File.Copy(changedFile, target, true);
-					} catch (Exception ex) {
-						output.AppendLine(String.Format("Error copying {0} to {1}:\n{2}", changedFile, target, ex.ToString()));
-						Console.WriteLine("ERROR - Failed to copy file. You will need to manually deploy.");
-					}
-				} else if (response == "a") {
-					break;
+				switch (response.ToLower()) {
+					case "y":
+						// Copy the file!
+						try {
+							File.Copy(changedFile, target, true);
+							output.AppendLine(String.Format("Successfully copied {0} to {1}", changedFile, target));
+						} catch (Exception ex) {
+							output.AppendLine(String.Format("Error copying {0} to {1}:\n{2}", changedFile, target, ex.ToString()));
+							Console.WriteLine("ERROR - Failed to copy file. You will need to manually deploy.");
+						}
+						break;
+					case "n":
+						Console.WriteLine("You will need to deploy this manually");
+						break;
+					case "c":
+						//TODO - implement
+						break;
 				}
 			}
 
 			return output.ToString();
+		}
+
+		/// <summary>
+		/// Show the specified prompt to the user, and show them an error until they specify a valid input.
+		/// </summary>
+		/// <param name="prompt">The prompt to show the user, for example "[Y]es or [N]o"</param>
+		/// <param name="validInputs">A case-insensitive list of inputs that are valid.</param>
+		/// <returns>The valid selection made by the user</returns>
+		private static string PromptUser(string prompt, string[] validInputs) {
+
+			// Prompt the user
+			Console.Write(prompt);
+
+			// Read their response
+			string userInput = Console.ReadLine();
+
+			// Loop until they respond with a valid option
+			while (!validInputs.Contains(userInput, StringComparer.OrdinalIgnoreCase)) {
+				Console.WriteLine("Please specify an option surrounded by []");
+				Console.Write(prompt);
+
+				userInput = Console.ReadLine();
+			}
+
+			return userInput;
 		}
 	}
 }
