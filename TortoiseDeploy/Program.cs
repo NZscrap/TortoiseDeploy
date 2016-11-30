@@ -8,6 +8,9 @@ using System.Linq;
 
 namespace TortoiseDeploy {
 	class Program {
+
+		private static Config config;
+
 		static void Main(string[] args) {
 			// We want to log everything, so that it can be auditted later if necessary.
 			StringBuilder output = new StringBuilder();
@@ -79,6 +82,10 @@ namespace TortoiseDeploy {
 					// Do the processing
 					string processingOutput = Process(args);
 					output.Append(processingOutput);
+
+					// Don't close until prompted to by the user
+					Console.WriteLine("\nDeployment completed.");
+					Console.ReadLine();
 				}
 			} catch (Exception ex) {
 				// This should never happen!
@@ -117,45 +124,71 @@ namespace TortoiseDeploy {
 			// Load up our config file
 			string configFilePath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "config.json");
 			output.AppendLine("Loading config from: " + configFilePath);
-			Config config;
 			using (StreamReader reader = new StreamReader(configFilePath)) {
-				config = JsonConvert.DeserializeObject<Config>(reader.ReadToEnd());
+				try {
+					config = JsonConvert.DeserializeObject<Config>(reader.ReadToEnd());
+				} catch {
+					output.AppendLine("Couldn't load config file! Aborting");
+					return output.ToString();
+				}
 			}
 
-			// Loop through each file, and launch the merge tool
+			// Loop through each changed path, and launch the merge tool
 			foreach(string changedFile in changedFiles) {
-				string target = config.GetDeploymentFolder(changedFile) + Path.GetFileName(changedFile);
+				output.Append(ProcessPath(changedFile));
+			}
 
-				// Lets launch our diff tool!
-				string diffArguments = changedFile + " " + target;
-				Process diffTool = System.Diagnostics.Process.Start(config.MergeToolPath, diffArguments);
-				diffTool.WaitForExit();
+			return output.ToString();
+		}
 
-				// Prompt the user as to whether we should copy the file
-				string prompt = String.Format("\nDeploy {0} to {1} this file?\n[Y]es, [N]o, [C]hange destination:", changedFile, target);
-				string response = PromptUser(prompt, new string[] { "y", "n", "c" });
+		private static string ProcessPath(string changedFile) {
+
+			StringBuilder output = new StringBuilder();
+			string destination = config.GetDeploymentFolder(changedFile) + Path.GetFileName(changedFile);
+
+			// Ask the user how we should proceed. They will be prompted until they either Deploy or Skip
+			bool hasProcessed = false;
+			while (!hasProcessed) {
+				string sourceDisplay = changedFile.Substring(changedFile.IndexOf(config.RepositoryRoot) + config.RepositoryRoot.Length);
+				string prompt = String.Format("Deploying {0} to {1}\nNote: Merging won't move to the next file, you'll still have a chance to deploy.\n[M]erge, [D]eploy, [S]kip, [U]pdate deployment folder:", sourceDisplay, destination);
+				string response = PromptUser(prompt, new string[] { "m", "d", "s", "u" });
 
 				// Add the user prompt to the log
 				output.Append(prompt);
 				output.Append(response);
 
-				// Handle the user input
-				switch (response.ToLower()) {
-					case "y":
-						// Copy the file!
+				switch (response) {
+					case "m":   // Merge
+						// Launch the configured diff tool
+						string diffArguments = changedFile + " " + destination;
+						Process diffTool = System.Diagnostics.Process.Start(config.MergeToolPath, diffArguments);
+						break;
+					case "d":
 						try {
-							File.Copy(changedFile, target, true);
-							output.AppendLine(String.Format("Successfully copied {0} to {1}", changedFile, target));
+							File.Copy(changedFile, destination, true);
+							output.AppendLine(String.Format("Successfully copied {0} to {1}", changedFile, destination));
+
+							// Show a success message in Yellow
+							Console.ForegroundColor = ConsoleColor.Yellow;
+							Console.WriteLine(String.Format("Successfully copied {0} to {1}", changedFile, destination));
+							Console.ResetColor();
 						} catch (Exception ex) {
-							output.AppendLine(String.Format("Error copying {0} to {1}:\n{2}", changedFile, target, ex.ToString()));
+							output.AppendLine(String.Format("Error copying {0} to {1}:\n{2}", changedFile, destination, ex.ToString()));
+
+							// Show an error in red
+							Console.ForegroundColor = ConsoleColor.Red;
 							Console.WriteLine("ERROR - Failed to copy file. You will need to manually deploy.");
+							Console.ResetColor();
 						}
+						hasProcessed = true;
 						break;
-					case "n":
+					case "s":
 						Console.WriteLine("You will need to deploy this manually");
+						output.AppendLine("You will need to deploy this manually");
+						hasProcessed = true;	// Move on to the next file
 						break;
-					case "c":
-						//TODO - implement
+					case "u":
+						// TODO - allow the user to specify a new deployment mapping
 						break;
 				}
 			}
@@ -177,12 +210,18 @@ namespace TortoiseDeploy {
 			// Read their response
 			string userInput = Console.ReadLine();
 
-			// Loop until they respond with a valid option
-			while (!validInputs.Contains(userInput, StringComparer.OrdinalIgnoreCase)) {
-				Console.WriteLine("Please specify an option surrounded by []");
-				Console.Write(prompt);
+			// If there are only certain validInputs, loop until the user enters one of them
+			if (validInputs != null && validInputs.Length > 0) {
+				while (!validInputs.Contains(userInput, StringComparer.OrdinalIgnoreCase)) {
+					// Show a red error message, prompting the user to enter a valid options
+					Console.ForegroundColor = ConsoleColor.Red;
+					Console.WriteLine("Please specify an option surrounded by []");
+					Console.ResetColor();
 
-				userInput = Console.ReadLine();
+					// Prompt the user again
+					Console.Write(prompt);
+					userInput = Console.ReadLine();
+				}
 			}
 
 			return userInput;
