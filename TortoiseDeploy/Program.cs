@@ -105,6 +105,10 @@ namespace TortoiseDeploy {
 				output.AppendLine("Paths changed:");
 				while (!reader.EndOfStream) {
 					string changedFile = reader.ReadLine();
+					// TortoiseSVN gives us the changed path linux-style (ie C:/folder/path/to/file.txt)
+					// We want to get the windows style (ie, C:\\folder\\path\\to\\file.txt)
+					// We're going to consistently deal in windows style paths
+					changedFile = Path.GetFullPath(changedFile);
 					changedFiles.Add(changedFile);
 					output.AppendLine(changedFile); // Add the changed path to our log output
 				}
