@@ -129,7 +129,7 @@ namespace TortoiseDeploy {
 
 				// Prompt the user as to whether we should copy the file
 				string prompt = String.Format("\nDeploy {0} to {1} this file?\n[Y]es, [N]o, [C]hange destination:", changedFile, target);
-				string response = PromptUser(prompt, new string[] { "y", "n", "c", "a" });
+				string response = PromptUser(prompt, new string[] { "y", "n", "c" });
 
 				// Add the user prompt to the log
 				output.Append(prompt);
