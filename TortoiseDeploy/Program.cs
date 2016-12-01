@@ -84,7 +84,7 @@ namespace TortoiseDeploy {
 					output.Append(processingOutput);
 
 					// Don't close until prompted to by the user
-					Console.WriteLine("\nDeployment completed.");
+					Console.WriteLine("\nFinished.\nPress any key to exit..");
 					Console.ReadLine();
 				}
 			} catch (Exception ex) {
@@ -119,6 +119,7 @@ namespace TortoiseDeploy {
 					changedFiles.Add(changedFile);
 					output.AppendLine(changedFile); // Add the changed path to our log output
 				}
+				output.AppendLine();	// Add a line of whitespace after listing our files, to make the logs a little easier to read
 			}
 
 			// Load up our config file
@@ -127,8 +128,14 @@ namespace TortoiseDeploy {
 			using (StreamReader reader = new StreamReader(configFilePath)) {
 				try {
 					config = JsonConvert.DeserializeObject<Config>(reader.ReadToEnd());
-				} catch {
-					output.AppendLine("Couldn't load config file! Aborting");
+				} catch (Exception ex) {
+					// Display an error to the user - they're going to have to manually deploy everything
+					Console.ForegroundColor = ConsoleColor.Red;
+					Console.WriteLine("Error loading deployment config. You will need to manually deploy.");
+					Console.ResetColor();
+
+					output.AppendLine("Couldn't load config file! Aborting with error:");
+					output.AppendLine(ex.ToString());
 					return output.ToString();
 				}
 			}
@@ -149,13 +156,13 @@ namespace TortoiseDeploy {
 			// Ask the user how we should proceed. They will be prompted until they either Deploy or Skip
 			bool hasProcessed = false;
 			while (!hasProcessed) {
-				string sourceDisplay = changedFile.Substring(changedFile.IndexOf(config.RepositoryRoot) + config.RepositoryRoot.Length);
+				string sourceDisplay = changedFile.Substring(changedFile.IndexOf(config.RepositoryRoot) + config.RepositoryRoot.Length + 1);
 				string prompt = String.Format("Deploying {0} to {1}\nNote: Merging won't move to the next file, you'll still have a chance to deploy.\n[M]erge, [D]eploy, [S]kip, [U]pdate deployment folder:", sourceDisplay, destination);
 				string response = PromptUser(prompt, new string[] { "m", "d", "s", "u" });
 
 				// Add the user prompt to the log
 				output.Append(prompt);
-				output.Append(response);
+				output.AppendLine(response);
 
 				switch (response) {
 					case "m":   // Merge
