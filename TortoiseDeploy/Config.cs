@@ -12,7 +12,7 @@ namespace TortoiseDeploy {
 		public string RepositoryRoot;
 
 		private Dictionary<string, string> _deploymentMap;
-		[JsonProperty]
+		[JsonProperty(Order = 1)]	// Setting order to 1 makes this the last field in the serialized data.
 		private Dictionary<string, string> DeploymentMap {
 			get {
 				return _deploymentMap;

@@ -1,9 +1,9 @@
 ﻿{
   "MergeToolPath": "C:\\Program Files (x86)\\Beyond Compare 4\\BCompare.exe",
+  "RepositoryRoot": "C:\\Users\\mitch\\Desktop\\TortoiseDeploy\\testing",
   "DeploymentMap": {
     "*": "C:\\Users\\mitch\\Desktop\\TortoiseDeploy-Deploy",
     "C:\\Users\\mitch\\Desktop\\TortoiseDeploy\\testing\\svn.txt": "C:\\Users\\mitch\\Desktop\\TortoiseDeploy-Deploy\\svn",
-    "C:\\Users\\mitch\\Desktop\\TortoiseDeploy\\testing": "C:\\Users\\mitch\\Desktop\\TortoiseDeploy-Deploy\\bestmatch"
-  },
-  "RepositoryRoot": "C:\\Users\\mitch\\Desktop\\TortoiseDeploy\\testing"
+    "\\": "C:\\Users\\mitch\\Desktop\\TortoiseDeploy-Deploy\\bestmatch"
+  }
 }
