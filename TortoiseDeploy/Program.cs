@@ -170,8 +170,8 @@ namespace TortoiseDeploy {
 
 				switch (response) {
 					case "m":   // Merge
-						// Launch the configured diff tool
-						string diffArguments = changedFile + " " + destination;
+								// Prep our arguments for the diff tool. We wrap the file paths in speech marks in case they contain spaces.
+						string diffArguments = String.Format("\"{0}\" \"{1}\"", changedFile, destination);
 
 						// Ensure a diff tool is configured / the file exists
 						if (!File.Exists(config.MergeToolPath)) {
@@ -198,14 +198,14 @@ namespace TortoiseDeploy {
 					case "d":
 						try {
 							File.Copy(changedFile, destination, true);
-							output.AppendLine(String.Format("Successfully copied {0} to {1}", changedFile, destination));
+							output.AppendLine(String.Format("\nSuccessfully copied {0} to {1}\n", changedFile, destination));
 
 							// Show a success message in Yellow
 							Console.ForegroundColor = ConsoleColor.Yellow;
 							Console.WriteLine(String.Format("Successfully copied {0} to {1}", changedFile, destination));
 							Console.ResetColor();
 						} catch (Exception ex) {
-							output.AppendLine(String.Format("Error copying {0} to {1}:\n{2}", changedFile, destination, ex.ToString()));
+							output.AppendLine(String.Format("\nError copying {0} to {1}:\n{2}\n", changedFile, destination, ex.ToString()));
 
 							// Show an error in red
 							Console.ForegroundColor = ConsoleColor.Red;
