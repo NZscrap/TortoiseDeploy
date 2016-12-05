@@ -33,8 +33,7 @@ namespace TortoiseDeploy {
 					output.AppendLine("Incorrect number of parameters - are you sure you're calling from TortoiseSVNs Post-Commit hook?");
 					output.AppendLine("Called with: " + String.Join(" ", args));
 
-					// Exit early
-					Environment.Exit(-1);
+					hasError = true;
 				}
 
 				// The first parameter is a file containing all the changed paths.
@@ -65,7 +64,6 @@ namespace TortoiseDeploy {
 				#endregion
 
 				// Do our processing, unless SVN had some sort of error trying to commit
-				//TODO - Test the "repo out of date" error condition to ensure this actually works
 				if (!hasError) {
 					// TortoiseSVN redirects output when calling commit hooks, so that it can read the output and use it for error detection in the hook script.
 					// Unfortunately, I really want to interact with the user, so I need to be able to output things.
@@ -73,7 +71,13 @@ namespace TortoiseDeploy {
 					if (args.Length == 6) {
 						output.AppendLine("Launching child process.");
 
-						// Launch ourselves again, with an extra 7th parameter
+						// Ensure the parent process write out to the log
+						string logFilePath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "log.txt");
+						using (StreamWriter writer = new StreamWriter(logFilePath, true)) {
+							writer.Write(output.ToString());
+						}
+
+						// Launch ourselves again, with an extra 7th parameter. Once the child returns, we will exit (returning the child exit code)
 						Process child = System.Diagnostics.Process.Start(System.Reflection.Assembly.GetExecutingAssembly().Location, String.Join(" ", args) + " LaunchAsChild");
 						child.WaitForExit();
 						Environment.Exit(child.ExitCode);
@@ -168,7 +172,28 @@ namespace TortoiseDeploy {
 					case "m":   // Merge
 						// Launch the configured diff tool
 						string diffArguments = changedFile + " " + destination;
-						Process diffTool = System.Diagnostics.Process.Start(config.MergeToolPath, diffArguments);
+
+						// Ensure a diff tool is configured / the file exists
+						if (!File.Exists(config.MergeToolPath)) {
+							output.AppendLine("Invalid merge tool");
+
+							Console.ForegroundColor = ConsoleColor.Red;
+							Console.WriteLine("Invalid merge tool. You will need to manually deploy the files.");   // TODO - Allow updating of merge tool location
+							Console.ResetColor();
+						}
+
+						// Try firing up the diff tool
+						try {
+							Process diffTool = System.Diagnostics.Process.Start(config.MergeToolPath, diffArguments);
+							output.AppendLine(String.Format("Opening diff tool ({0}) with arguments ({1})", config.MergeToolPath, diffArguments));
+						} catch (Exception ex) {
+							output.AppendLine("Error opening diff tool:");
+							output.AppendLine(ex.ToString());
+
+							Console.ForegroundColor = ConsoleColor.Red;
+							Console.WriteLine("Error opening diff tool");
+							Console.ResetColor();
+						}
 						break;
 					case "d":
 						try {
