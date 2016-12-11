@@ -35,7 +35,7 @@ namespace TortoiseDeploy {
 		/// <summary>
 		/// Find the relevant destination directory that we should deploy a given input file to.
 		/// </summary>
-		/// <param name="sourcePath">The FULL path of the file we'll be copying</param>
+		/// <param name="sourcePath">The FULL path of the file on disk that we'll be copying</param>
 		/// <returns>The folder we should copy the file to, including a trailing slash. Note this doesn't include the file name.</returns>
 		public string GetDeploymentFolder(string sourcePath) {
 
@@ -46,13 +46,25 @@ namespace TortoiseDeploy {
 				response = ProcessingMap[sourcePath];
 			}
 
-			// Look for the best-match source.
-			// We define best-match as the most-specific folder path, ie the longest path name
-			foreach(string potentialMatch in ProcessingMap.Keys.OrderByDescending(path => path.Length)) {
-				// Since we're sorting from the longest path to the shortest, the first match we find is what we want!
-				if (sourcePath.StartsWith(potentialMatch)) {
-					response = ProcessingMap[potentialMatch];
-					break;
+			// If there was no exact match, look for a best-match source
+			if (String.IsNullOrEmpty(response)) {
+				// We define best-match as the most-specific folder path, ie the longest path name
+				foreach (string potentialMatch in ProcessingMap.Keys.OrderByDescending(path => path.Length)) {
+					// Since we're sorting from the longest path to the shortest, the first match we find is what we want!
+					if (sourcePath.StartsWith(potentialMatch)) {
+						// As this is a StartsWith check, it's possible that we have further directory nesting.
+						// Eg, Assume sourcePath is ~/Desktop/TortoiseDeploy/config.json, and potentialMatch is ~/Deskop which maps to /var/svn
+						//     We would expect to get back a deployment folder of /var/svn/TortoiseDeploy
+						string postMatch = "";
+						if (potentialMatch.Length < Path.GetDirectoryName(sourcePath).Length) {
+							// We want to find the remaining folder structure beyond what we matched on, and include it in our response
+							postMatch = Path.GetDirectoryName(sourcePath).Substring(potentialMatch.Length);
+						}
+
+						// Our response should be the deployment path that maps to the matched path, plus any postMatch directory structure
+						response = ProcessingMap[potentialMatch] + Path.DirectorySeparatorChar + postMatch;
+						break;
+					}
 				}
 			}
 
@@ -61,6 +73,7 @@ namespace TortoiseDeploy {
 				response = ProcessingMap["*"];
 			}
 
+			// Ensure that we return the path with a trailing seperator character
 			return response.EndsWith(Path.DirectorySeparatorChar.ToString()) ? response : response + Path.DirectorySeparatorChar.ToString();
 		}
 	}
