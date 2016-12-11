@@ -164,10 +164,6 @@ namespace TortoiseDeploy {
 				string prompt = String.Format("Deploying {0} to {1}\nNote: Merging won't move to the next file, you'll still have a chance to deploy.\n[M]erge, [D]eploy, [S]kip, [U]pdate deployment folder:", sourceDisplay, destination);
 				string response = PromptUser(prompt, new string[] { "m", "d", "s", "u" });
 
-				// Add the user prompt to the log
-				output.Append(prompt);
-				output.AppendLine(response);
-
 				switch (response) {
 					case "m":   // Merge
 								// Prep our arguments for the diff tool. We wrap the file paths in speech marks in case they contain spaces.
@@ -180,19 +176,21 @@ namespace TortoiseDeploy {
 							Console.ForegroundColor = ConsoleColor.Red;
 							Console.WriteLine("Invalid merge tool. You will need to manually deploy the files.");   // TODO - Allow updating of merge tool location
 							Console.ResetColor();
-						}
 
-						// Try firing up the diff tool
-						try {
-							Process diffTool = System.Diagnostics.Process.Start(config.MergeToolPath, diffArguments);
-							output.AppendLine(String.Format("Opening diff tool ({0}) with arguments ({1})", config.MergeToolPath, diffArguments));
-						} catch (Exception ex) {
-							output.AppendLine("Error opening diff tool:");
-							output.AppendLine(ex.ToString());
+						} else {
 
-							Console.ForegroundColor = ConsoleColor.Red;
-							Console.WriteLine("Error opening diff tool");
-							Console.ResetColor();
+							// Try firing up the diff tool
+							try {
+								Process diffTool = System.Diagnostics.Process.Start(config.MergeToolPath, diffArguments);
+								output.AppendLine(String.Format("Opening diff tool ({0}) with arguments ({1})", config.MergeToolPath, diffArguments));
+							} catch (Exception ex) {
+								output.AppendLine("Error opening diff tool:");
+								output.AppendLine(ex.ToString());
+
+								Console.ForegroundColor = ConsoleColor.Red;
+								Console.WriteLine("Error opening diff tool");
+								Console.ResetColor();
+							}
 						}
 						break;
 					case "d":
@@ -216,7 +214,6 @@ namespace TortoiseDeploy {
 						break;
 					case "s":
 						Console.WriteLine("You will need to deploy this manually");
-						output.AppendLine("You will need to deploy this manually");
 						hasProcessed = true;	// Move on to the next file
 						break;
 					case "u":
