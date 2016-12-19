@@ -78,7 +78,7 @@ namespace TortoiseDeploy {
 						}
 
 						// Launch ourselves again, with an extra 7th parameter. Once the child returns, we will exit (returning the child exit code)
-						Process child = System.Diagnostics.Process.Start(System.Reflection.Assembly.GetExecutingAssembly().Location, String.Join(" ", args) + " LaunchAsChild");
+						Process child = System.Diagnostics.Process.Start(System.Reflection.Assembly.GetExecutingAssembly().Location, "\"" + String.Join("\" \"", args) + "\" LaunchAsChild");
 						child.WaitForExit();
 						Environment.Exit(child.ExitCode);
 					}
