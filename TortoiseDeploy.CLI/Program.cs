@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Linq;
+using Newtonsoft.Json;
 
-namespace TortoiseDeploy {
+namespace TortoiseDeploy.CLI {
 	class Program {
 
 		private static Config config;
@@ -125,7 +125,7 @@ namespace TortoiseDeploy {
 					changedFiles.Add(changedFile);
 					output.AppendLine(changedFile); // Add the changed path to our log output
 				}
-				output.AppendLine();	// Add a line of whitespace after listing our files, to make the logs a little easier to read
+				output.AppendLine();    // Add a line of whitespace after listing our files, to make the logs a little easier to read
 			}
 
 			// Load up our config file
@@ -147,7 +147,7 @@ namespace TortoiseDeploy {
 			}
 
 			// Loop through each changed path, and launch the merge tool
-			foreach(string changedFile in changedFiles) {
+			foreach (string changedFile in changedFiles) {
 				output.Append(ProcessPath(changedFile));
 			}
 
@@ -216,7 +216,7 @@ namespace TortoiseDeploy {
 						break;
 					case "s":
 						Console.WriteLine("You will need to deploy this manually");
-						hasProcessed = true;	// Move on to the next file
+						hasProcessed = true;    // Move on to the next file
 						break;
 				}
 			}
