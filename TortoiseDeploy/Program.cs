@@ -86,10 +86,6 @@ namespace TortoiseDeploy {
 					// Do the processing
 					string processingOutput = Process(args);
 					output.Append(processingOutput);
-
-					// Don't close until prompted to by the user
-					Console.WriteLine("\nFinished.\nPress any key to exit..");
-					Console.ReadLine();
 				}
 			} catch (Exception ex) {
 				// This should never happen!
@@ -98,12 +94,18 @@ namespace TortoiseDeploy {
 				output.AppendLine(ex.ToString());
 			} finally {
 
+				output.AppendLine("Execution ended at " + DateTime.Now.ToString());
+
 				// We always want to write to the log file (Appending if one already exists)
 				string logFilePath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "log.txt");
 				using (StreamWriter writer = new StreamWriter(logFilePath, true)) {
 					writer.Write(output.ToString());
 				}
 			}
+
+			// Don't close until prompted to by the user
+			Console.WriteLine("\n\nPress any key to exit..");
+			Console.ReadLine();
 		}
 
 		static string Process(string[] args) {
@@ -181,8 +183,8 @@ namespace TortoiseDeploy {
 
 							// Try firing up the diff tool
 							try {
+								output.AppendLine(String.Format("Opening diff tool ({0}) with arguments {1}", config.MergeToolPath, diffArguments));
 								Process diffTool = System.Diagnostics.Process.Start(config.MergeToolPath, diffArguments);
-								output.AppendLine(String.Format("Opening diff tool ({0}) with arguments ({1})", config.MergeToolPath, diffArguments));
 							} catch (Exception ex) {
 								output.AppendLine("Error opening diff tool:");
 								output.AppendLine(ex.ToString());
@@ -196,11 +198,11 @@ namespace TortoiseDeploy {
 					case "d":
 						try {
 							File.Copy(changedFile, destination, true);
-							output.AppendLine(String.Format("\nSuccessfully copied {0} to {1}\n", changedFile, destination));
+							output.AppendLine(String.Format("Copied {0} to {1}", changedFile, destination));
 
 							// Show a success message in Yellow
 							Console.ForegroundColor = ConsoleColor.Yellow;
-							Console.WriteLine(String.Format("Successfully copied {0} to {1}", changedFile, destination));
+							Console.WriteLine(String.Format("Copied {0} to {1}", changedFile, destination));
 							Console.ResetColor();
 						} catch (Exception ex) {
 							output.AppendLine(String.Format("\nError copying {0} to {1}:\n{2}\n", changedFile, destination, ex.ToString()));
