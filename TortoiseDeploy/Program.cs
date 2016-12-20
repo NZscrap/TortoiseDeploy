@@ -163,8 +163,8 @@ namespace TortoiseDeploy {
 			bool hasProcessed = false;
 			while (!hasProcessed) {
 				string sourceDisplay = changedFile.Substring(changedFile.IndexOf(config.RepositoryRoot) + config.RepositoryRoot.Length + 1);
-				string prompt = String.Format("Deploying {0} to {1}\nNote: Merging won't move to the next file, you'll still have a chance to deploy.\n[M]erge, [D]eploy, [S]kip, [U]pdate deployment folder:", sourceDisplay, destination);
-				string response = PromptUser(prompt, new string[] { "m", "d", "s", "u" });
+				string prompt = String.Format("Deploying {0} to {1}\nNote: Merging won't move to the next file, you'll still have a chance to deploy.\n[M]erge, [D]eploy, [S]kip:", sourceDisplay, destination);
+				string response = PromptUser(prompt, new string[] { "m", "d", "s" });
 
 				switch (response) {
 					case "m":   // Merge
@@ -217,9 +217,6 @@ namespace TortoiseDeploy {
 					case "s":
 						Console.WriteLine("You will need to deploy this manually");
 						hasProcessed = true;	// Move on to the next file
-						break;
-					case "u":
-						// TODO - allow the user to specify a new deployment mapping
 						break;
 				}
 			}
