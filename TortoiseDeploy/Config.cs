@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.IO;
 
 namespace TortoiseDeploy {
-	public class Config {
+	class Config {
 		public string MergeToolPath;
 		public string RepositoryRoot;
 
