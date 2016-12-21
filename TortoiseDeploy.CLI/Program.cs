@@ -1,28 +1,24 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Linq;
+using Newtonsoft.Json;
 
-namespace TortoiseDeploy {
+namespace TortoiseDeploy.CLI {
 	class Program {
 
-		private static Config config;
+		public static TortoiseDeploy deployer;
 
 		static void Main(string[] args) {
-			// We want to log everything, so that it can be auditted later if necessary.
-			StringBuilder output = new StringBuilder();
+			// Used to write to an error file
+			StringBuilder errors = new StringBuilder();
 
 			// For paranoia's sake, we're wrapping everything in a try/catch.
 			// This should only be used as a last resort, to log that we had a completely unexpected exception.
 			try {
 				bool hasError = false;
-
-				// Log that we've started an execution run
-				output.AppendLine("\n\n**********************************************************************");
-				output.AppendLine("Execution started at " + DateTime.Now.ToString());
 
 				#region Validation
 
@@ -30,8 +26,8 @@ namespace TortoiseDeploy {
 				// TortoiseSVN passes 6 parameters for a Post-commit hook. When we call ourselves, we add a seventh parameter.
 				// To learn why we call ourselves, read beyond the validation
 				if (args.Length != 6 && args.Length != 7) {
-					output.AppendLine("Incorrect number of parameters - are you sure you're calling from TortoiseSVNs Post-Commit hook?");
-					output.AppendLine("Called with: " + String.Join(" ", args));
+					errors.AppendLine("Incorrect number of parameters - are you sure you're calling from TortoiseSVNs Post-Commit hook?");
+					errors.AppendLine("Called with: " + String.Join(" ", args));
 
 					hasError = true;
 				}
@@ -40,7 +36,7 @@ namespace TortoiseDeploy {
 				// We read it during the Process method, but we should check that it exists now.
 				if (!File.Exists(args[0])) {
 					hasError = true;
-					output.AppendLine("Temp file containing changes (" + args[0] + ") doesn't exist on disk");
+					errors.AppendLine("Temp file containing changes (" + args[0] + ") doesn't exist on disk");
 				}
 
 				// The fifth parameter is an error file, which will be empty if the Commit succeeded.
@@ -50,15 +46,15 @@ namespace TortoiseDeploy {
 						// If the file actually has contents, we want to exit early.
 						if (!reader.EndOfStream) {
 							hasError = true;
-							output.AppendLine("An error occurred during the commit operation:");
-							output.AppendLine("-----------------------------------------------");
-							output.Append(reader.ReadToEnd());
-							output.AppendLine("-----------------------------------------------");
+							errors.AppendLine("An error occurred during the commit operation:");
+							errors.AppendLine("-----------------------------------------------");
+							errors.Append(reader.ReadToEnd());
+							errors.AppendLine("-----------------------------------------------");
 						}
 					}
 				} catch {
 					hasError = true;
-					output.AppendLine("Couldn't open error file - aborting.");
+					errors.AppendLine("Couldn't open error file - aborting.");
 				}
 
 				#endregion
@@ -69,14 +65,6 @@ namespace TortoiseDeploy {
 					// Unfortunately, I really want to interact with the user, so I need to be able to output things.
 					// The solution is to execute ourself again, adding an extra parameter to the end of all the TortoiseSVN arguments.
 					if (args.Length == 6) {
-						output.AppendLine("Launching child process.");
-
-						// Ensure the parent process write out to the log
-						string logFilePath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "log.txt");
-						using (StreamWriter writer = new StreamWriter(logFilePath, true)) {
-							writer.Write(output.ToString());
-						}
-
 						// Launch ourselves again, with an extra 7th parameter. Once the child returns, we will exit (returning the child exit code)
 						Process child = System.Diagnostics.Process.Start(System.Reflection.Assembly.GetExecutingAssembly().Location, "\"" + String.Join("\" \"", args) + "\" LaunchAsChild");
 						child.WaitForExit();
@@ -84,23 +72,32 @@ namespace TortoiseDeploy {
 					}
 
 					// Do the processing
-					string processingOutput = Process(args);
-					output.Append(processingOutput);
+					Process(args);
 				}
 			} catch (Exception ex) {
 				// This should never happen!
 				// If we're winding up in this block, we really want to know about it - and fix the underlying code!
-				output.AppendLine("*********** FATAL EXCEPTION ***********");
-				output.AppendLine(ex.ToString());
+				errors.AppendLine("*********** FATAL EXCEPTION ***********");
+				errors.AppendLine("Error logged at " + DateTime.Now.ToString());
+				errors.AppendLine(ex.ToString());
 			} finally {
+				// Write to the error log if we've got any errors
+				if (!String.IsNullOrEmpty(errors.ToString())) {
 
-				output.AppendLine("Execution ended at " + DateTime.Now.ToString());
-
-				// We always want to write to the log file (Appending if one already exists)
-				string logFilePath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "log.txt");
-				using (StreamWriter writer = new StreamWriter(logFilePath, true)) {
-					writer.Write(output.ToString());
+					// Our errors log is errors.txt in the same folder as the executable
+					string logFilePath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "errors.txt");
+					using (StreamWriter writer = new StreamWriter(logFilePath, true)) {
+						writer.Write(errors.ToString());
+					}
 				}
+			}
+
+			// If we've got any errors during this execution, output them to the user at the end
+			if (!String.IsNullOrEmpty(errors.ToString())) {
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("Errors occurred:");
+				Console.WriteLine(errors.ToString());
+				Console.ResetColor();
 			}
 
 			// Don't close until prompted to by the user
@@ -108,14 +105,19 @@ namespace TortoiseDeploy {
 			Console.ReadLine();
 		}
 
-		static string Process(string[] args) {
+		/// <summary>
+		/// Process the committed files.
+		/// </summary>
+		/// <param name="args">Commandline arguments, as passed by TortoiseSVN's post-commit hook.</param>
+		static void Process(string[] args) {
+			// We'll log the complete list of changed files, as reported by TortoiseSVN
 			StringBuilder output = new StringBuilder();
+			output.AppendLine("Paths changed:");
 
 			// The first parameter from TortoiseSVN is a temp file containing a list of the files that changed (one changed file per line)
 			// We read this into a list of files that changed, which we will process individually
 			List<string> changedFiles = new List<string>();
 			using (StreamReader reader = new StreamReader(args[0])) {
-				output.AppendLine("Paths changed:");
 				while (!reader.EndOfStream) {
 					string changedFile = reader.ReadLine();
 					// TortoiseSVN gives us the changed path linux-style (ie C:/folder/path/to/file.txt)
@@ -125,103 +127,77 @@ namespace TortoiseDeploy {
 					changedFiles.Add(changedFile);
 					output.AppendLine(changedFile); // Add the changed path to our log output
 				}
-				output.AppendLine();	// Add a line of whitespace after listing our files, to make the logs a little easier to read
+				output.AppendLine();    // Add a line of whitespace after listing our files, to make the logs a little easier to read
 			}
 
-			// Load up our config file
-			string configFilePath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "config.json");
-			output.AppendLine("Loading config from: " + configFilePath);
-			using (StreamReader reader = new StreamReader(configFilePath)) {
-				try {
-					config = JsonConvert.DeserializeObject<Config>(reader.ReadToEnd());
-				} catch (Exception ex) {
-					// Display an error to the user - they're going to have to manually deploy everything
-					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("Error loading deployment config. You will need to manually deploy.");
-					Console.ResetColor();
+			// Instantiate our TortoiseDeploy engine - it will be used to merge/deploy the files
+			deployer = new TortoiseDeploy(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "config.json"));
 
-					output.AppendLine("Couldn't load config file! Aborting with error:");
-					output.AppendLine(ex.ToString());
-					return output.ToString();
+			// Check that the config was correctly loaded, and start processing the files if it was
+			if (deployer.Ready) {
+				// Add our log of changed paths
+				deployer.LogMessage(output.ToString());
+
+				// For each file that changed, we want to prompt the user for an action
+				foreach (string changedFile in changedFiles) {
+					ProcessPath(changedFile);
 				}
-			}
-
-			// Loop through each changed path, and launch the merge tool
-			foreach(string changedFile in changedFiles) {
-				output.Append(ProcessPath(changedFile));
-			}
-
-			return output.ToString();
+			} else { 
+				// Display an error to the user - they're going to have to manually deploy everything
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("Error loading deployment config. You will need to manually deploy.");
+				Console.ResetColor();
+			}			
 		}
 
-		private static string ProcessPath(string changedFile) {
+		/// <summary>
+		/// Prompt the user for how they want to do for a particular file.
+		/// We currently support Merging, Deploying, and Skipping.
+		/// </summary>
+		/// <param name="changedFile">Local path of the file that changed</param>
+		private static void ProcessPath(string changedFile) {
 
-			StringBuilder output = new StringBuilder();
-			string destination = config.GetDeploymentFolder(changedFile) + Path.GetFileName(changedFile);
+			// Figure out where we will be deploying the file
+			string destination = deployer.GetDeploymentTarget(changedFile);
 
 			// Ask the user how we should proceed. They will be prompted until they either Deploy or Skip
 			bool hasProcessed = false;
 			while (!hasProcessed) {
-				string sourceDisplay = changedFile.Substring(changedFile.IndexOf(config.RepositoryRoot) + config.RepositoryRoot.Length + 1);
+				string sourceDisplay = deployer.GetDisplayName(changedFile);
 				string prompt = String.Format("Deploying {0} to {1}\nNote: Merging won't move to the next file, you'll still have a chance to deploy.\n[M]erge, [D]eploy, [S]kip:", sourceDisplay, destination);
 				string response = PromptUser(prompt, new string[] { "m", "d", "s" });
 
 				switch (response) {
 					case "m":   // Merge
-								// Prep our arguments for the diff tool. We wrap the file paths in speech marks in case they contain spaces.
-						string diffArguments = String.Format("\"{0}\" \"{1}\"", changedFile, destination);
-
-						// Ensure a diff tool is configured / the file exists
-						if (!File.Exists(config.MergeToolPath)) {
-							output.AppendLine("Invalid merge tool");
-
+						// Launch merge tool, and show an error if it fails
+						if (!deployer.Merge(changedFile, destination)) {
 							Console.ForegroundColor = ConsoleColor.Red;
-							Console.WriteLine("Invalid merge tool. You will need to manually deploy the files.");   // TODO - Allow updating of merge tool location
+							Console.WriteLine("Error opening diff tool");
 							Console.ResetColor();
-
-						} else {
-
-							// Try firing up the diff tool
-							try {
-								output.AppendLine(String.Format("Opening diff tool ({0}) with arguments {1}", config.MergeToolPath, diffArguments));
-								Process diffTool = System.Diagnostics.Process.Start(config.MergeToolPath, diffArguments);
-							} catch (Exception ex) {
-								output.AppendLine("Error opening diff tool:");
-								output.AppendLine(ex.ToString());
-
-								Console.ForegroundColor = ConsoleColor.Red;
-								Console.WriteLine("Error opening diff tool");
-								Console.ResetColor();
-							}
 						}
 						break;
-					case "d":
-						try {
-							File.Copy(changedFile, destination, true);
-							output.AppendLine(String.Format("Copied {0} to {1}", changedFile, destination));
-
+					case "d":	// Deploy
+						// Attempt to deploy the file
+						if (deployer.Deploy(changedFile, destination)) {
 							// Show a success message in Yellow
 							Console.ForegroundColor = ConsoleColor.Yellow;
 							Console.WriteLine(String.Format("Copied {0} to {1}", changedFile, destination));
 							Console.ResetColor();
-						} catch (Exception ex) {
-							output.AppendLine(String.Format("\nError copying {0} to {1}:\n{2}\n", changedFile, destination, ex.ToString()));
-
+						} else {
 							// Show an error in red
 							Console.ForegroundColor = ConsoleColor.Red;
 							Console.WriteLine("ERROR - Failed to copy file. You will need to manually deploy.");
 							Console.ResetColor();
 						}
+
 						hasProcessed = true;
 						break;
-					case "s":
+					case "s":	// Skip
 						Console.WriteLine("You will need to deploy this manually");
-						hasProcessed = true;	// Move on to the next file
+						hasProcessed = true;
 						break;
 				}
 			}
-
-			return output.ToString();
 		}
 
 		/// <summary>
