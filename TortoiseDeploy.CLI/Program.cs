@@ -131,7 +131,7 @@ namespace TortoiseDeploy.CLI {
 			}
 
 			// Instantiate our TortoiseDeploy engine - it will be used to merge/deploy the files
-			deployer = new TortoiseDeploy(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "config.json"));
+			deployer = new TortoiseDeploy();
 
 			// Check that the config was correctly loaded, and start processing the files if it was
 			if (deployer.Ready) {
