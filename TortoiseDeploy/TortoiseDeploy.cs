@@ -12,8 +12,11 @@ namespace TortoiseDeploy {
 
 		private Config config;
 
-		public StringBuilder Log { get; private set; }
+		private StringBuilder _log;
+		public string Log { get { return _log.ToString(); } }
 		public Boolean Ready { get; private set; }
+
+		public TortoiseDeploy() : this(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "config.json")) { }
 
 		/// <summary>
 		/// Instantiate a new TortoiseDeploy instance from the specified config file.
@@ -22,9 +25,9 @@ namespace TortoiseDeploy {
 		/// <param name="configPath">Path on disk to a config file that can be deserialized.</param>
 		public TortoiseDeploy(string configPath) {
 			// Instantiate our log object, and log our start time
-			this.Log = new StringBuilder();
-			this.Log.AppendLine("\n\n**********************************************************************");
-			this.Log.AppendLine("TortoiseDeploy instance created at " + DateTime.Now.ToString());
+			this._log = new StringBuilder();
+			this._log.AppendLine("**********************************************************************");
+			this._log.AppendLine("TortoiseDeploy instance created at " + DateTime.Now.ToString());
 
 			// Attempt to load the config file
 			using (StreamReader reader = new StreamReader(configPath)) {
@@ -33,8 +36,8 @@ namespace TortoiseDeploy {
 					this.Ready = true;
 				} catch (Exception ex) {
 
-					Log.AppendLine("Couldn't load config file! Aborting with error:");
-					Log.AppendLine(ex.ToString());
+					_log.AppendLine("Couldn't load config file! Aborting with error:");
+					_log.AppendLine(ex.ToString());
 
 					this.Ready = false;
 				}
@@ -48,7 +51,8 @@ namespace TortoiseDeploy {
 		~TortoiseDeploy() {
 
 			// Log our exit time
-			Log.AppendLine("TortoiseDeploy instance destroyed at " + DateTime.Now.ToString());
+			_log.AppendLine("TortoiseDeploy instance destroyed at " + DateTime.Now.ToString());
+			_log.AppendLine("\n");
 
 			// Write out to a file named log.txt in the executable folder
 			string logFilePath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "log.txt");
@@ -56,7 +60,7 @@ namespace TortoiseDeploy {
 			// Attempt to write out to the log file.
 			try {
 				using (StreamWriter writer = new StreamWriter(logFilePath, true)) {
-					writer.Write(Log.ToString());
+					writer.Write(_log.ToString());
 				}
 			} catch { }	// Unfortunately we can't do anything but sink the exception
 		}
@@ -70,10 +74,10 @@ namespace TortoiseDeploy {
 		public bool Deploy(string source, string destination) {
 			try {
 				File.Copy(source, destination, true);
-				Log.AppendLine(String.Format("Copied {0} to {1}", source, destination));
+				_log.AppendLine(String.Format("Copied {0} to {1}", source, destination));
 				return true;
 			} catch (Exception ex) {
-				Log.AppendLine(String.Format("\nError copying {0} to {1}:\n{2}\n", source, destination, ex.ToString()));
+				_log.AppendLine(String.Format("\nError copying {0} to {1}:\n{2}\n", source, destination, ex.ToString()));
 			}
 			return false;
 		}
@@ -91,20 +95,20 @@ namespace TortoiseDeploy {
 
 			// Ensure we have a diff tool configured
 			if (!File.Exists(config.MergeToolPath)) {
-				Log.AppendLine(String.Format("Configured merge tool ({0}) doesn't exist.", config.MergeToolPath));
+				_log.AppendLine(String.Format("Configured merge tool ({0}) doesn't exist.", config.MergeToolPath));
 
 				return false;
 			}
 
 			// Launch the diff tool
 			try {
-				Log.AppendLine(String.Format("Opening diff tool ({0}) with arguments {1}", config.MergeToolPath, diffArguments));
+				_log.AppendLine(String.Format("Opening diff tool ({0}) with arguments {1}", config.MergeToolPath, diffArguments));
 				Process diffTool = System.Diagnostics.Process.Start(config.MergeToolPath, diffArguments);
 
 				return true;	// Return immediately, so the user doesn't have to close their diff tool before continuing with TortoiseDeploy
 			} catch (Exception ex) {
-				Log.AppendLine("Error running diff tool:");
-				Log.AppendLine(ex.ToString());
+				_log.AppendLine("Error running diff tool:");
+				_log.AppendLine(ex.ToString());
 			}
 
 			// Assume we failed
@@ -135,7 +139,7 @@ namespace TortoiseDeploy {
 		/// </summary>
 		/// <param name="message">Message to add to the log file</param>
 		public void LogMessage(string message) {
-			Log.AppendLine(message);
+			_log.AppendLine(message);
 		}
 	}
 }
