@@ -14,6 +14,7 @@ namespace TortoiseDeploy.GUI {
 
 		TortoiseDeploy deployer;
 		List<string> changedPaths;
+		List<DeploymentMapping> deploymentMappings;
 
 		public Form1() {
 			InitializeComponent();
@@ -32,16 +33,17 @@ namespace TortoiseDeploy.GUI {
 			int maxPathLength = changedPaths.Max(s => deployer.GetDisplayName(s).Length);
 
 			// Create a source => destination display string for each file
-			List<string> display = new List<string>();
+			deploymentMappings = new List<DeploymentMapping>();
 			foreach(string path in changedPaths) {
 				string displayPath = deployer.GetDisplayName(path);
 				// Pad the displayname up to the longest one, so that our => symbol shows consistently
 				displayPath += new string(' ', Math.Abs(displayPath.Length - maxPathLength));
-				display.Add(displayPath + "\t=>\t" + deployer.GetDeploymentTarget(path));
+				displayPath += "\t=>\t" + deployer.GetDeploymentTarget(path);
+				deploymentMappings.Add(new DeploymentMapping(path, displayPath));
 			}
 
 			// Set the list of files that changed
-			((ListBox)this.checkListChangedPaths).DataSource = display;
+			((ListBox)this.checkListChangedPaths).DataSource = deploymentMappings;
 
 			OverwriteLog(deployer.Log);
 		}
@@ -50,14 +52,29 @@ namespace TortoiseDeploy.GUI {
 			this.txtLog.Text = log;
 		}
 
-		private void btnMerge_Click(object sender, EventArgs e) {
-			StringBuilder output = new StringBuilder();
+		private List<DeploymentMapping> getSelected() {
+			List<DeploymentMapping> returnVal = new List<DeploymentMapping>();
 
-			foreach(var i in this.checkListChangedPaths.CheckedItems) {
-				output.AppendLine(i.ToString());
+			foreach(var selected in this.checkListChangedPaths.CheckedItems) {
+				returnVal.Add(this.deploymentMappings.Where(m => m.Display == selected.ToString()).First());
 			}
 
-			MessageBox.Show(output.ToString());
+			return returnVal;
+		}
+
+		private void btnMerge_Click(object sender, EventArgs e) {
+			foreach(var i in getSelected()) {
+				deployer.Merge(i.Source, deployer.GetDeploymentTarget(i.Source));
+			}
+
+			// Update the log output
+			OverwriteLog(deployer.Log);
+		}
+
+		private void btnDeploy_Click(object sender, EventArgs e) {
+			foreach (var i in getSelected()) {
+				deployer.Deploy(i.Source, deployer.GetDeploymentTarget(i.Source));
+			}
 
 			// Update the log output
 			OverwriteLog(deployer.Log);
@@ -75,9 +92,8 @@ namespace TortoiseDeploy.GUI {
 			}
 		}
 
-		private void btnDeploy_Click(object sender, EventArgs e) {
-			// Update the log output
-			OverwriteLog(deployer.Log);
+		private void richTextBox1_LinkClicked(object sender, LinkClickedEventArgs e) {
+			System.Diagnostics.Process.Start(e.LinkText.ToString());
 		}
 	}
 }
