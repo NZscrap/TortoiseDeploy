@@ -133,6 +133,23 @@ namespace TortoiseDeploy.GUI {
 		}
 
 		/// <summary>
+		/// Handle the click event of the Open button. This launches the default tool to handle these files, as configured by the OS
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void btnOpen_Click(object sender, EventArgs e) {
+			// Ensure the progressbar settings are reset
+			this.progressBar.Minimum = 0;
+			this.progressBar.Maximum = getSelected().Count;
+			this.progressBar.Value = 0;
+
+			foreach (DeploymentMapping i in getSelected()) {
+				System.Diagnostics.Process.Start(i.Source);
+				this.progressBar.Value++;   // Update the progressbar
+			}
+		}
+
+		/// <summary>
 		/// Handle click events on the "Select All / None" checkbox.
 		/// This will select / deselect all of the files in the list.
 		/// </summary>

@@ -31,6 +31,7 @@
 			this.richTextBox1 = new System.Windows.Forms.RichTextBox();
 			this.progressBar = new System.Windows.Forms.ProgressBar();
 			this.fileCopyWorker = new System.ComponentModel.BackgroundWorker();
+			this.btnOpen = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// checkListChangedPaths
@@ -50,7 +51,7 @@
 			// 
 			this.btnMerge.Location = new System.Drawing.Point(12, 300);
 			this.btnMerge.Name = "btnMerge";
-			this.btnMerge.Size = new System.Drawing.Size(224, 46);
+			this.btnMerge.Size = new System.Drawing.Size(155, 46);
 			this.btnMerge.TabIndex = 1;
 			this.btnMerge.Text = "Merge Selected";
 			this.btnMerge.UseVisualStyleBackColor = true;
@@ -69,9 +70,9 @@
 			// 
 			// btnDeploy
 			// 
-			this.btnDeploy.Location = new System.Drawing.Point(242, 300);
+			this.btnDeploy.Location = new System.Drawing.Point(173, 300);
 			this.btnDeploy.Name = "btnDeploy";
-			this.btnDeploy.Size = new System.Drawing.Size(224, 46);
+			this.btnDeploy.Size = new System.Drawing.Size(155, 46);
 			this.btnDeploy.TabIndex = 3;
 			this.btnDeploy.Text = "Deploy Selected";
 			this.btnDeploy.UseVisualStyleBackColor = true;
@@ -79,7 +80,7 @@
 			// 
 			// txtLog
 			// 
-			this.txtLog.Location = new System.Drawing.Point(12, 352);
+			this.txtLog.Location = new System.Drawing.Point(11, 352);
 			this.txtLog.Name = "txtLog";
 			this.txtLog.ReadOnly = true;
 			this.txtLog.Size = new System.Drawing.Size(769, 242);
@@ -88,11 +89,11 @@
 			// 
 			// richTextBox1
 			// 
-			this.richTextBox1.Location = new System.Drawing.Point(479, 300);
+			this.richTextBox1.Location = new System.Drawing.Point(495, 300);
 			this.richTextBox1.Name = "richTextBox1";
 			this.richTextBox1.ReadOnly = true;
 			this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-			this.richTextBox1.Size = new System.Drawing.Size(301, 45);
+			this.richTextBox1.Size = new System.Drawing.Size(285, 45);
 			this.richTextBox1.TabIndex = 5;
 			this.richTextBox1.Text = "Contribute on Github! https://github.com/MitchReidNZ/TortoiseDeploy";
 			this.richTextBox1.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.richTextBox1_LinkClicked);
@@ -111,11 +112,22 @@
 			this.fileCopyWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker_ProgressChanged);
 			this.fileCopyWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.fileCopyWorker_RunWorkerCompleted);
 			// 
+			// btnOpen
+			// 
+			this.btnOpen.Location = new System.Drawing.Point(334, 300);
+			this.btnOpen.Name = "btnOpen";
+			this.btnOpen.Size = new System.Drawing.Size(155, 46);
+			this.btnOpen.TabIndex = 7;
+			this.btnOpen.Text = "Open Selected";
+			this.btnOpen.UseVisualStyleBackColor = true;
+			this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(794, 606);
+			this.Controls.Add(this.btnOpen);
 			this.Controls.Add(this.progressBar);
 			this.Controls.Add(this.richTextBox1);
 			this.Controls.Add(this.txtLog);
@@ -141,6 +153,7 @@
 		private System.Windows.Forms.RichTextBox richTextBox1;
 		private System.Windows.Forms.ProgressBar progressBar;
 		private System.ComponentModel.BackgroundWorker fileCopyWorker;
+		private System.Windows.Forms.Button btnOpen;
 	}
 }
 
