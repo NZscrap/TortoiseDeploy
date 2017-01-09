@@ -30,6 +30,7 @@
 			this.txtLog = new System.Windows.Forms.RichTextBox();
 			this.richTextBox1 = new System.Windows.Forms.RichTextBox();
 			this.progressBar = new System.Windows.Forms.ProgressBar();
+			this.fileCopyWorker = new System.ComponentModel.BackgroundWorker();
 			this.SuspendLayout();
 			// 
 			// checkListChangedPaths
@@ -103,6 +104,13 @@
 			this.progressBar.Size = new System.Drawing.Size(655, 17);
 			this.progressBar.TabIndex = 6;
 			// 
+			// fileCopyWorker
+			// 
+			this.fileCopyWorker.WorkerReportsProgress = true;
+			this.fileCopyWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
+			this.fileCopyWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker_ProgressChanged);
+			this.fileCopyWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.fileCopyWorker_RunWorkerCompleted);
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -132,6 +140,7 @@
 		private System.Windows.Forms.RichTextBox txtLog;
 		private System.Windows.Forms.RichTextBox richTextBox1;
 		private System.Windows.Forms.ProgressBar progressBar;
+		private System.ComponentModel.BackgroundWorker fileCopyWorker;
 	}
 }
 

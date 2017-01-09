@@ -125,11 +125,8 @@ namespace TortoiseDeploy.GUI {
 			this.progressBar.Maximum = getSelected().Count;
 			this.progressBar.Value = 0;
 
-			// Loop through all of our selected files, and deploy them one at a time.
-			foreach (var i in getSelected()) {
-				deployer.Deploy(i.Source, deployer.GetDeploymentTarget(i.Source));
-				this.progressBar.Value++;   // Update the progressbar
-			}
+			// Use the background worker to merge the files
+			this.fileCopyWorker.RunWorkerAsync(getSelected());
 
 			// Update the log output
 			OverwriteLog(deployer.Log);
@@ -161,6 +158,45 @@ namespace TortoiseDeploy.GUI {
 		/// <param name="e"></param>
 		private void richTextBox1_LinkClicked(object sender, LinkClickedEventArgs e) {
 			System.Diagnostics.Process.Start(e.LinkText.ToString());
+		}
+
+		/// <summary>
+		/// Use the background worker to deploy files.
+		/// </summary>
+		/// <param name="sender">Reference to the background worker object</param>
+		/// <param name="e">e.Argument contains the list of DeploymentMappings we'll be deploying</param>
+		private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+			BackgroundWorker worker = sender as BackgroundWorker;
+
+			int percentagePerFile = 100 / ((List<DeploymentMapping>)e.Argument).Count;
+
+			// Copy each file, using the deployer
+			int i = 0;
+			foreach(DeploymentMapping file in (List<DeploymentMapping>)e.Argument) {
+				deployer.Deploy(file.Source, deployer.GetDeploymentTarget(file.Source));
+				worker.ReportProgress(i * percentagePerFile);
+				i++;
+			}
+		}
+
+		/// <summary>
+		/// Update the progress bar to show the user how far through our file deployments we've been.
+		/// This is called after each file is copied, from backgroundWorker_DoWork
+		/// </summary>
+		/// <param name="sender">Reference to the background worker object</param>
+		/// <param name="e">Arguments</param>
+		private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
+			this.progressBar.Value++;
+		}
+
+		/// <summary>
+		/// Update the output log once the background worker has finished.
+		/// </summary>
+		/// <param name="sender">Reference to the background worker object</param>
+		/// <param name="e">Arguments</param>
+		private void fileCopyWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+			// Update the log output
+			OverwriteLog(deployer.Log);
 		}
 	}
 }
