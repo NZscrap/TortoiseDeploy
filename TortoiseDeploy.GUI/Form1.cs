@@ -15,9 +15,11 @@ namespace TortoiseDeploy.GUI {
 		TortoiseDeploy deployer;
 		List<string> changedPaths;
 		List<DeploymentMapping> deploymentMappings;
+		string errors;
 
-		public Form1(List<String> changedPaths) {
+		public Form1(List<String> changedPaths, string errors) {
 			this.changedPaths = changedPaths;
+			this.errors = errors;
 
 			InitializeComponent();
 		}
@@ -27,22 +29,36 @@ namespace TortoiseDeploy.GUI {
 			// Create our deployer instance so that we can merge/deploy the files
 			deployer = new TortoiseDeploy();
 
-			// Identify the longest display name in our list of changed paths
-			int maxPathLength = changedPaths.Max(s => deployer.GetDisplayName(s).Length);
+			// Only do our initial setup if there weren't any errors on startup
+			if (String.IsNullOrEmpty(errors)) {
+				// Identify the longest display name in our list of changed paths
+				int maxPathLength = 0;
+				if (changedPaths.Count > 0) {
+					changedPaths.Max(s => deployer.GetDisplayName(s).Length);
+				}
 
-			// Create a source => destination display string for each file
-			deploymentMappings = new List<DeploymentMapping>();
-			foreach(string path in changedPaths) {
-				string displayPath = deployer.GetDisplayName(path);
-				// Pad the displayname up to the longest one, so that our => symbol shows consistently
-				displayPath += new string(' ', Math.Abs(displayPath.Length - maxPathLength));
-				displayPath += "\t=>\t" + deployer.GetDeploymentTarget(path);
-				deploymentMappings.Add(new DeploymentMapping(path, displayPath));
+				// Create a source => destination display string for each file
+				deploymentMappings = new List<DeploymentMapping>();
+				foreach (string path in changedPaths) {
+					string displayPath = deployer.GetDisplayName(path);
+					// Pad the displayname up to the longest one, so that our => symbol shows consistently
+					displayPath += new string(' ', Math.Abs(displayPath.Length - maxPathLength));
+					displayPath += "\t=>\t" + deployer.GetDeploymentTarget(path);
+					deploymentMappings.Add(new DeploymentMapping(path, displayPath));
+				}
+
+				// Set the list of files that changed.
+				// If there weren't any, we'll show our usage message
+				if (deploymentMappings.Count > 0) {
+					((ListBox)this.checkListChangedPaths).DataSource = deploymentMappings;
+				}
+			} else {
+				// If there were any errors, add them to the deployer log.
+				// This will ensure they're shown in the GUI, and written to the log file.
+				deployer.LogMessage(errors);
 			}
 
-			// Set the list of files that changed
-			((ListBox)this.checkListChangedPaths).DataSource = deploymentMappings;
-
+			// Update the GUI log box
 			OverwriteLog(deployer.Log);
 		}
 

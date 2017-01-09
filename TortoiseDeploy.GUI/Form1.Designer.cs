@@ -33,14 +33,12 @@
 			// 
 			// checkListChangedPaths
 			// 
+			this.checkListChangedPaths.CheckOnClick = true;
 			this.checkListChangedPaths.FormattingEnabled = true;
 			this.checkListChangedPaths.Items.AddRange(new object[] {
-            "Country Road UAT\\Website\\Xslt\\Default.xslt\t->\t\\\\crvweb6.estaronline.local\\Country" +
-                " Road UAT\\Website\\Xslt\\Default.xslt",
-            "Country Road UAT\\Website\\Xslt\\Cart.xslt\t\t->\t\\\\crvweb6.estaronline.local\\Country R" +
-                "oad UAT\\Website\\Xslt\\Cart.xslt",
-            "Country Road UAT\\Website\\Assets\\cr_scripts.js \t->\t\\\\crvweb6.estaronline.local\\Cou" +
-                "ntry Road UAT\\Website\\Assets\\cr_scripts.js"});
+            "TortoiseDeploy needs to be called as a TortoiseSVN Post Commit hook.",
+            "Check out the documentation at https://tortoisesvn.net/docs/release/TortoiseSVN_e" +
+                "n/tsvn-dug-settings.html for further information"});
 			this.checkListChangedPaths.Location = new System.Drawing.Point(12, 12);
 			this.checkListChangedPaths.Name = "checkListChangedPaths";
 			this.checkListChangedPaths.Size = new System.Drawing.Size(769, 259);
@@ -94,7 +92,7 @@
 			this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
 			this.richTextBox1.Size = new System.Drawing.Size(301, 45);
 			this.richTextBox1.TabIndex = 5;
-			this.richTextBox1.Text = "Grab the code from https://github.com/MitchReidNZ/TortoiseDeploy";
+			this.richTextBox1.Text = "Contribute on Github! https://github.com/MitchReidNZ/TortoiseDeploy";
 			this.richTextBox1.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.richTextBox1_LinkClicked);
 			// 
 			// Form1
