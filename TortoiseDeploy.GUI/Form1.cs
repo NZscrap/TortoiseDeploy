@@ -67,7 +67,12 @@ namespace TortoiseDeploy.GUI {
 		/// </summary>
 		/// <param name="log">Text to display</param>
 		private void OverwriteLog(string log) {
-			this.txtLog.Text = log;
+			// First, we clear the old log message
+			this.txtLog.Text = "";
+
+			// Richtextbox's will auto-scroll to the end if they have focus and we call AppendText
+			this.txtLog.Focus();
+			this.txtLog.AppendText(log);
 		}
 
 		/// <summary>
@@ -91,10 +96,16 @@ namespace TortoiseDeploy.GUI {
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void btnMerge_Click(object sender, EventArgs e) {
-			
+
+			// Ensure the progressbar settings are reset
+			this.progressBar.Minimum = 0;
+			this.progressBar.Maximum = getSelected().Count;
+			this.progressBar.Value = 0;
+
 			// Loop through each of the selected files individually and launch the merge tool
-			foreach(var i in getSelected()) {
+			foreach (var i in getSelected()) {
 				deployer.Merge(i.Source, deployer.GetDeploymentTarget(i.Source));
+				this.progressBar.Value++;	// Update the progressbar
 			}
 
 			// Update the log output
@@ -108,10 +119,16 @@ namespace TortoiseDeploy.GUI {
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void btnDeploy_Click(object sender, EventArgs e) {
-			
+
+			// Ensure the progressbar settings are reset
+			this.progressBar.Minimum = 0;
+			this.progressBar.Maximum = getSelected().Count;
+			this.progressBar.Value = 0;
+
 			// Loop through all of our selected files, and deploy them one at a time.
 			foreach (var i in getSelected()) {
 				deployer.Deploy(i.Source, deployer.GetDeploymentTarget(i.Source));
+				this.progressBar.Value++;   // Update the progressbar
 			}
 
 			// Update the log output

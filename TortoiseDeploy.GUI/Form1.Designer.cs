@@ -29,6 +29,7 @@
 			this.btnDeploy = new System.Windows.Forms.Button();
 			this.txtLog = new System.Windows.Forms.RichTextBox();
 			this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+			this.progressBar = new System.Windows.Forms.ProgressBar();
 			this.SuspendLayout();
 			// 
 			// checkListChangedPaths
@@ -95,11 +96,19 @@
 			this.richTextBox1.Text = "Contribute on Github! https://github.com/MitchReidNZ/TortoiseDeploy";
 			this.richTextBox1.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.richTextBox1_LinkClicked);
 			// 
+			// progressBar
+			// 
+			this.progressBar.Location = new System.Drawing.Point(125, 277);
+			this.progressBar.Name = "progressBar";
+			this.progressBar.Size = new System.Drawing.Size(655, 17);
+			this.progressBar.TabIndex = 6;
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(794, 606);
+			this.Controls.Add(this.progressBar);
 			this.Controls.Add(this.richTextBox1);
 			this.Controls.Add(this.txtLog);
 			this.Controls.Add(this.btnDeploy);
@@ -122,6 +131,7 @@
 		private System.Windows.Forms.Button btnDeploy;
 		private System.Windows.Forms.RichTextBox txtLog;
 		private System.Windows.Forms.RichTextBox richTextBox1;
+		private System.Windows.Forms.ProgressBar progressBar;
 	}
 }
 
