@@ -23,87 +23,21 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
-			this.checkListChangedPaths = new System.Windows.Forms.CheckedListBox();
-			this.btnMerge = new System.Windows.Forms.Button();
-			this.chkBoxSelectAll = new System.Windows.Forms.CheckBox();
-			this.btnDeploy = new System.Windows.Forms.Button();
-			this.txtLog = new System.Windows.Forms.RichTextBox();
-			this.richTextBox1 = new System.Windows.Forms.RichTextBox();
-			this.progressBar = new System.Windows.Forms.ProgressBar();
 			this.fileCopyWorker = new System.ComponentModel.BackgroundWorker();
+			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+			this.checkListChangedPaths = new System.Windows.Forms.CheckedListBox();
 			this.btnOpen = new System.Windows.Forms.Button();
+			this.progressBar = new System.Windows.Forms.ProgressBar();
+			this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+			this.txtLog = new System.Windows.Forms.RichTextBox();
+			this.btnDeploy = new System.Windows.Forms.Button();
+			this.chkBoxSelectAll = new System.Windows.Forms.CheckBox();
+			this.btnMerge = new System.Windows.Forms.Button();
+			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+			this.splitContainer1.Panel1.SuspendLayout();
+			this.splitContainer1.Panel2.SuspendLayout();
+			this.splitContainer1.SuspendLayout();
 			this.SuspendLayout();
-			// 
-			// checkListChangedPaths
-			// 
-			this.checkListChangedPaths.CheckOnClick = true;
-			this.checkListChangedPaths.FormattingEnabled = true;
-			this.checkListChangedPaths.Items.AddRange(new object[] {
-            "TortoiseDeploy needs to be called as a TortoiseSVN Post Commit hook.",
-            "Check out the documentation at https://tortoisesvn.net/docs/release/TortoiseSVN_e" +
-                "n/tsvn-dug-settings.html for further information"});
-			this.checkListChangedPaths.Location = new System.Drawing.Point(12, 12);
-			this.checkListChangedPaths.Name = "checkListChangedPaths";
-			this.checkListChangedPaths.Size = new System.Drawing.Size(769, 259);
-			this.checkListChangedPaths.TabIndex = 0;
-			// 
-			// btnMerge
-			// 
-			this.btnMerge.Location = new System.Drawing.Point(12, 300);
-			this.btnMerge.Name = "btnMerge";
-			this.btnMerge.Size = new System.Drawing.Size(155, 46);
-			this.btnMerge.TabIndex = 1;
-			this.btnMerge.Text = "Merge Selected";
-			this.btnMerge.UseVisualStyleBackColor = true;
-			this.btnMerge.Click += new System.EventHandler(this.btnMerge_Click);
-			// 
-			// chkBoxSelectAll
-			// 
-			this.chkBoxSelectAll.AutoSize = true;
-			this.chkBoxSelectAll.Location = new System.Drawing.Point(12, 277);
-			this.chkBoxSelectAll.Name = "chkBoxSelectAll";
-			this.chkBoxSelectAll.Size = new System.Drawing.Size(107, 17);
-			this.chkBoxSelectAll.TabIndex = 2;
-			this.chkBoxSelectAll.Text = "Select All / None";
-			this.chkBoxSelectAll.UseVisualStyleBackColor = true;
-			this.chkBoxSelectAll.CheckedChanged += new System.EventHandler(this.chkBoxSelectAll_CheckedChanged);
-			// 
-			// btnDeploy
-			// 
-			this.btnDeploy.Location = new System.Drawing.Point(173, 300);
-			this.btnDeploy.Name = "btnDeploy";
-			this.btnDeploy.Size = new System.Drawing.Size(155, 46);
-			this.btnDeploy.TabIndex = 3;
-			this.btnDeploy.Text = "Deploy Selected";
-			this.btnDeploy.UseVisualStyleBackColor = true;
-			this.btnDeploy.Click += new System.EventHandler(this.btnDeploy_Click);
-			// 
-			// txtLog
-			// 
-			this.txtLog.Location = new System.Drawing.Point(11, 352);
-			this.txtLog.Name = "txtLog";
-			this.txtLog.ReadOnly = true;
-			this.txtLog.Size = new System.Drawing.Size(769, 242);
-			this.txtLog.TabIndex = 4;
-			this.txtLog.Text = "";
-			// 
-			// richTextBox1
-			// 
-			this.richTextBox1.Location = new System.Drawing.Point(495, 300);
-			this.richTextBox1.Name = "richTextBox1";
-			this.richTextBox1.ReadOnly = true;
-			this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-			this.richTextBox1.Size = new System.Drawing.Size(285, 45);
-			this.richTextBox1.TabIndex = 5;
-			this.richTextBox1.Text = "Contribute on Github! https://github.com/MitchReidNZ/TortoiseDeploy";
-			this.richTextBox1.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.richTextBox1_LinkClicked);
-			// 
-			// progressBar
-			// 
-			this.progressBar.Location = new System.Drawing.Point(125, 277);
-			this.progressBar.Name = "progressBar";
-			this.progressBar.Size = new System.Drawing.Size(655, 17);
-			this.progressBar.TabIndex = 6;
 			// 
 			// fileCopyWorker
 			// 
@@ -112,48 +46,149 @@
 			this.fileCopyWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker_ProgressChanged);
 			this.fileCopyWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.fileCopyWorker_RunWorkerCompleted);
 			// 
+			// splitContainer1
+			// 
+			this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.splitContainer1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.splitContainer1.Location = new System.Drawing.Point(0, 0);
+			this.splitContainer1.Name = "splitContainer1";
+			this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+			// 
+			// splitContainer1.Panel1
+			// 
+			this.splitContainer1.Panel1.Controls.Add(this.checkListChangedPaths);
+			// 
+			// splitContainer1.Panel2
+			// 
+			this.splitContainer1.Panel2.Controls.Add(this.btnOpen);
+			this.splitContainer1.Panel2.Controls.Add(this.progressBar);
+			this.splitContainer1.Panel2.Controls.Add(this.richTextBox1);
+			this.splitContainer1.Panel2.Controls.Add(this.txtLog);
+			this.splitContainer1.Panel2.Controls.Add(this.btnDeploy);
+			this.splitContainer1.Panel2.Controls.Add(this.chkBoxSelectAll);
+			this.splitContainer1.Panel2.Controls.Add(this.btnMerge);
+			this.splitContainer1.Size = new System.Drawing.Size(766, 554);
+			this.splitContainer1.SplitterDistance = 277;
+			this.splitContainer1.TabIndex = 8;
+			// 
+			// checkListChangedPaths
+			// 
+			this.checkListChangedPaths.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.checkListChangedPaths.CheckOnClick = true;
+			this.checkListChangedPaths.FormattingEnabled = true;
+			this.checkListChangedPaths.Items.AddRange(new object[] {
+            "TortoiseDeploy needs to be called as a TortoiseSVN Post Commit hook.",
+            "Check out the documentation at https://tortoisesvn.net/docs/release/TortoiseSVN_e" +
+                "n/tsvn-dug-settings.html for further information"});
+			this.checkListChangedPaths.Location = new System.Drawing.Point(0, 0);
+			this.checkListChangedPaths.Margin = new System.Windows.Forms.Padding(0);
+			this.checkListChangedPaths.Name = "checkListChangedPaths";
+			this.checkListChangedPaths.Size = new System.Drawing.Size(764, 274);
+			this.checkListChangedPaths.TabIndex = 1;
+			// 
 			// btnOpen
 			// 
-			this.btnOpen.Location = new System.Drawing.Point(334, 300);
+			this.btnOpen.Location = new System.Drawing.Point(331, 26);
 			this.btnOpen.Name = "btnOpen";
 			this.btnOpen.Size = new System.Drawing.Size(155, 46);
-			this.btnOpen.TabIndex = 7;
+			this.btnOpen.TabIndex = 14;
 			this.btnOpen.Text = "Open Selected";
 			this.btnOpen.UseVisualStyleBackColor = true;
-			this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
+			// 
+			// progressBar
+			// 
+			this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.progressBar.Location = new System.Drawing.Point(125, 3);
+			this.progressBar.Name = "progressBar";
+			this.progressBar.Size = new System.Drawing.Size(628, 17);
+			this.progressBar.TabIndex = 13;
+			// 
+			// richTextBox1
+			// 
+			this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.richTextBox1.Location = new System.Drawing.Point(492, 26);
+			this.richTextBox1.Name = "richTextBox1";
+			this.richTextBox1.ReadOnly = true;
+			this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
+			this.richTextBox1.Size = new System.Drawing.Size(261, 45);
+			this.richTextBox1.TabIndex = 12;
+			this.richTextBox1.Text = "Contribute on Github! https://github.com/MitchReidNZ/TortoiseDeploy";
+			// 
+			// txtLog
+			// 
+			this.txtLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.txtLog.Location = new System.Drawing.Point(3, 78);
+			this.txtLog.Name = "txtLog";
+			this.txtLog.ReadOnly = true;
+			this.txtLog.Size = new System.Drawing.Size(750, 193);
+			this.txtLog.TabIndex = 11;
+			this.txtLog.Text = "";
+			// 
+			// btnDeploy
+			// 
+			this.btnDeploy.Location = new System.Drawing.Point(170, 26);
+			this.btnDeploy.Name = "btnDeploy";
+			this.btnDeploy.Size = new System.Drawing.Size(155, 46);
+			this.btnDeploy.TabIndex = 10;
+			this.btnDeploy.Text = "Deploy Selected";
+			this.btnDeploy.UseVisualStyleBackColor = true;
+			// 
+			// chkBoxSelectAll
+			// 
+			this.chkBoxSelectAll.AutoSize = true;
+			this.chkBoxSelectAll.Location = new System.Drawing.Point(12, 3);
+			this.chkBoxSelectAll.Name = "chkBoxSelectAll";
+			this.chkBoxSelectAll.Size = new System.Drawing.Size(107, 17);
+			this.chkBoxSelectAll.TabIndex = 9;
+			this.chkBoxSelectAll.Text = "Select All / None";
+			this.chkBoxSelectAll.UseVisualStyleBackColor = true;
+			// 
+			// btnMerge
+			// 
+			this.btnMerge.Location = new System.Drawing.Point(9, 26);
+			this.btnMerge.Name = "btnMerge";
+			this.btnMerge.Size = new System.Drawing.Size(155, 46);
+			this.btnMerge.TabIndex = 8;
+			this.btnMerge.Text = "Merge Selected";
+			this.btnMerge.UseVisualStyleBackColor = true;
 			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(794, 606);
-			this.Controls.Add(this.btnOpen);
-			this.Controls.Add(this.progressBar);
-			this.Controls.Add(this.richTextBox1);
-			this.Controls.Add(this.txtLog);
-			this.Controls.Add(this.btnDeploy);
-			this.Controls.Add(this.chkBoxSelectAll);
-			this.Controls.Add(this.btnMerge);
-			this.Controls.Add(this.checkListChangedPaths);
+			this.ClientSize = new System.Drawing.Size(763, 550);
+			this.Controls.Add(this.splitContainer1);
 			this.Name = "Form1";
 			this.Text = "TortoiseDeploy";
 			this.Load += new System.EventHandler(this.Form1_Load);
+			this.splitContainer1.Panel1.ResumeLayout(false);
+			this.splitContainer1.Panel2.ResumeLayout(false);
+			this.splitContainer1.Panel2.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+			this.splitContainer1.ResumeLayout(false);
 			this.ResumeLayout(false);
-			this.PerformLayout();
 
 		}
 
 		#endregion
-
-		private System.Windows.Forms.CheckedListBox checkListChangedPaths;
-		private System.Windows.Forms.Button btnMerge;
-		private System.Windows.Forms.CheckBox chkBoxSelectAll;
-		private System.Windows.Forms.Button btnDeploy;
-		private System.Windows.Forms.RichTextBox txtLog;
-		private System.Windows.Forms.RichTextBox richTextBox1;
-		private System.Windows.Forms.ProgressBar progressBar;
 		private System.ComponentModel.BackgroundWorker fileCopyWorker;
+		private System.Windows.Forms.SplitContainer splitContainer1;
+		private System.Windows.Forms.CheckedListBox checkListChangedPaths;
 		private System.Windows.Forms.Button btnOpen;
+		private System.Windows.Forms.ProgressBar progressBar;
+		private System.Windows.Forms.RichTextBox richTextBox1;
+		private System.Windows.Forms.RichTextBox txtLog;
+		private System.Windows.Forms.Button btnDeploy;
+		private System.Windows.Forms.CheckBox chkBoxSelectAll;
+		private System.Windows.Forms.Button btnMerge;
 	}
 }
 

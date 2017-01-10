@@ -203,7 +203,13 @@ namespace TortoiseDeploy.GUI {
 		/// <param name="sender">Reference to the background worker object</param>
 		/// <param name="e">Arguments</param>
 		private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-			this.progressBar.Value++;
+			// Update our progress bar
+			if (this.progressBar.Value < this.progressBar.Maximum) {
+				this.progressBar.Value++;
+			}
+
+			// Update the output log, so that it's refreshed after each file is copied.
+			OverwriteLog(deployer.Log);
 		}
 
 		/// <summary>
