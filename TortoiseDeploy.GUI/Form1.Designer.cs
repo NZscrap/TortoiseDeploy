@@ -81,6 +81,7 @@
 			this.listChangedPaths.FormattingEnabled = true;
 			this.listChangedPaths.Location = new System.Drawing.Point(-1, -1);
 			this.listChangedPaths.Name = "listChangedPaths";
+			this.listChangedPaths.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
 			this.listChangedPaths.Size = new System.Drawing.Size(762, 277);
 			this.listChangedPaths.TabIndex = 2;
 			// 

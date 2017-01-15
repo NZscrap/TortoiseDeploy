@@ -27,7 +27,7 @@ namespace TortoiseDeploy {
 		/// Whether we've run the Pre Deployment Script or not.
 		/// </summary>
 		[JsonIgnore]
-		public bool PreDeploymentRun = false;
+		public bool PreDeploymentHasRun = false;
 
 		/// <summary>
 		/// Command to be executed after deploying files from this DeploymentGroup.

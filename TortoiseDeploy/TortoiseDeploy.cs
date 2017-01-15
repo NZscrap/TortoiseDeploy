@@ -105,11 +105,42 @@ namespace TortoiseDeploy {
 		/// <returns>Whether the deployment succeeded</returns>
 		public bool Deploy(string source, string destination) {
 			try {
+
+				// Run the Pre-deployment step if it hasn't been run yet
+				DeploymentGroup group = config.GetDeploymentGroup(source);
+				if (group != null && !group.PreDeploymentHasRun && !String.IsNullOrEmpty(group.PreDeploymentScript)) {
+					// Check whether the PreDeploymentScript exists. If not, we'll try looking in the same folder as our binary
+					if (!File.Exists(group.PreDeploymentScript)) {
+						group.PreDeploymentScript = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), group.PreDeploymentScript);
+
+						// If the PreDeploymentScript file still doesn't exist, log an error and abort. DO NOT COPY THE FILE
+						if (!File.Exists(group.PreDeploymentScript)) {
+							LogMessage("The Pre-deployment script cannot be found! Aborted file copy.");
+						}
+					}
+
+					LogMessage(String.Format("Launching Pre-deployment script ({0}) with arguments: {1}", group.PreDeploymentScript, group.PreDeploymentArguments));
+
+					// Try to run the script until it's completed before continuing
+					Process preDeploymentScript = Process.Start(group.PreDeploymentScript, group.PreDeploymentArguments);
+					preDeploymentScript.WaitForExit();
+
+					// Check the exit status. As is convention, a status of 0 is a success, anything else is some sort of failure
+					if (preDeploymentScript.ExitCode == 0) {
+						LogMessage("Pre-deployment script succeeded");
+					} else {
+						LogMessage("Pre-deployment script failed!");
+					}
+
+					// Mark our Pre-deployment step as having been run
+					group.PreDeploymentHasRun = true;
+				}
+
 				File.Copy(source, destination, true);
-				_log.AppendLine(String.Format("Copied {0} to {1}", source, destination));
+				LogMessage(String.Format("Copied {0} to {1}", source, destination));
 				return true;
 			} catch (Exception ex) {
-				_log.AppendLine(String.Format("\nError copying {0} to {1}:\n{2}\n", source, destination, ex.ToString()));
+				LogMessage(String.Format("\nError copying {0} to {1}:\n{2}\n", source, destination, ex.ToString()));
 			}
 			return false;
 		}
