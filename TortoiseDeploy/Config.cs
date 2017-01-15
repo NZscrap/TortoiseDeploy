@@ -1,9 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 
 namespace TortoiseDeploy {
@@ -13,10 +10,20 @@ namespace TortoiseDeploy {
 
 		public List<DeploymentGroup> DeploymentGroups { get; set; }
 
+		/// <summary>
+		/// Get the DeploymentGroup that the specified sourcePath belongs to.
+		/// </summary>
+		/// <param name="sourcePath">Local file on disk</param>
+		/// <returns>DeploymentGroup containing the DeploymentMapping for the specified source file</returns>
 		public DeploymentGroup GetDeploymentGroup(string sourcePath) {
 			return DeploymentGroups.Where(dg => dg.DeploymentMappings.Contains(GetDeploymentMapping(sourcePath))).FirstOrDefault();
 		}
 
+		/// <summary>
+		/// Find the relevant DeploymentMapping for the specified source file.
+		/// </summary>
+		/// <param name="sourcePath">Local file on disk</param>
+		/// <returns>DeploymentMapping object that specifies where the sourcePath should be deployed.</returns>
 		public DeploymentMapping GetDeploymentMapping(string sourcePath) {
 			foreach (DeploymentGroup group in DeploymentGroups) {
 				// First we'll check for an exact match on the file source
