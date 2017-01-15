@@ -7,7 +7,7 @@
       "PreDeploymentScript": "preDeployment.bat",
       "PreDeploymentArguments": "ArgumentPassedIn",
       "PostDeploymentScript": "postDeployment.bat",
-      "PostDeploymentArguments": "GoRecycleTheWebsite",
+      "PostDeploymentArguments": "GoRecycleTheWebsite.txt",
       "DeploymentMappings": [
         {
           "Source": "C:\\Users\\mitch\\Desktop\\local tortoiseDeploy tests",

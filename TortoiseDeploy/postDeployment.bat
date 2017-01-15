@@ -1,1 +1,2 @@
-echo "Pre-deployment with argument %1" >> postdeployment.txt
+@echo off
+echo. >> %1
