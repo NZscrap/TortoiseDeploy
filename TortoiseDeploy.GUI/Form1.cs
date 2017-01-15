@@ -14,12 +14,18 @@ namespace TortoiseDeploy.GUI {
 
 		TortoiseDeploy deployer;
 		List<string> changedPaths;
-		List<DeploymentMapping> deploymentMappings;
+		List<DeploymentDisplay> deploymentMappings;
 		string errors;
 
 		public Form1(List<String> changedPaths, string errors) {
 			this.changedPaths = changedPaths;
 			this.errors = errors;
+
+			// DEBUG
+			if (this.changedPaths.Count == 0) {
+				this.changedPaths.Add("C:\\Users\\mitch\\Desktop\\local tortoiseDeploy tests\\abc.txt");
+				this.changedPaths.Add("C:\\Users\\mitch\\Desktop\\local tortoiseDeploy tests\\new.txt");
+			}
 
 			InitializeComponent();
 		}
@@ -38,13 +44,10 @@ namespace TortoiseDeploy.GUI {
 				}
 
 				// Create a source => destination display string for each file
-				deploymentMappings = new List<DeploymentMapping>();
+				deploymentMappings = new List<DeploymentDisplay>();
 				foreach (string path in changedPaths) {
-					string displayPath = deployer.GetDisplayName(path);
-					// Pad the displayname up to the longest one, so that our => symbol shows consistently
-					displayPath += new string(' ', Math.Abs(displayPath.Length - maxPathLength));
-					displayPath += "\t=>\t" + deployer.GetDeploymentTarget(path);
-					deploymentMappings.Add(new DeploymentMapping(path, displayPath));
+					string destination = deployer.GetDeploymentTarget(path);
+					deploymentMappings.Add(new DeploymentDisplay(path, destination));
 				}
 
 				// Set the list of files that changed.
@@ -79,8 +82,8 @@ namespace TortoiseDeploy.GUI {
 		/// Get the list of DeploymentMapping objects representing all of the selected files
 		/// </summary>
 		/// <returns>List of selected DeploymentMapping items</returns>
-		private List<DeploymentMapping> getSelected() {
-			List<DeploymentMapping> returnVal = new List<DeploymentMapping>();
+		private List<DeploymentDisplay> getSelected() {
+			List<DeploymentDisplay> returnVal = new List<DeploymentDisplay>();
 
 			foreach(var selected in this.listChangedPaths.SelectedItems) {
 				returnVal.Add(this.deploymentMappings.Where(m => m.Display == selected.ToString()).First());
@@ -104,7 +107,7 @@ namespace TortoiseDeploy.GUI {
 
 			// Loop through each of the selected files individually and launch the merge tool
 			foreach (var i in getSelected()) {
-				deployer.Merge(i.Source, deployer.GetDeploymentTarget(i.Source));
+				deployer.Merge(i.Source, i.Destination);
 				this.progressBar.Value++;	// Update the progressbar
 			}
 
@@ -143,7 +146,7 @@ namespace TortoiseDeploy.GUI {
 			this.progressBar.Maximum = getSelected().Count;
 			this.progressBar.Value = 0;
 
-			foreach (DeploymentMapping i in getSelected()) {
+			foreach (DeploymentDisplay i in getSelected()) {
 				System.Diagnostics.Process.Start(i.Source);
 				this.progressBar.Value++;   // Update the progressbar
 			}
@@ -185,12 +188,12 @@ namespace TortoiseDeploy.GUI {
 		private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
 			BackgroundWorker worker = sender as BackgroundWorker;
 
-			int percentagePerFile = 100 / ((List<DeploymentMapping>)e.Argument).Count;
+			int percentagePerFile = 100 / ((List<DeploymentDisplay>)e.Argument).Count;
 
 			// Copy each file, using the deployer
 			int i = 0;
-			foreach(DeploymentMapping file in (List<DeploymentMapping>)e.Argument) {
-				deployer.Deploy(file.Source, deployer.GetDeploymentTarget(file.Source));
+			foreach(DeploymentDisplay file in (List<DeploymentDisplay>)e.Argument) {
+				deployer.Deploy(file.Source, file.Destination);
 				worker.ReportProgress(i * percentagePerFile);
 				i++;
 			}

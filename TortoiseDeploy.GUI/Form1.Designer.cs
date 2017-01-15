@@ -25,6 +25,7 @@
 		private void InitializeComponent() {
 			this.fileCopyWorker = new System.ComponentModel.BackgroundWorker();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+			this.listChangedPaths = new System.Windows.Forms.ListBox();
 			this.btnOpen = new System.Windows.Forms.Button();
 			this.progressBar = new System.Windows.Forms.ProgressBar();
 			this.richTextBox1 = new System.Windows.Forms.RichTextBox();
@@ -32,7 +33,6 @@
 			this.btnDeploy = new System.Windows.Forms.Button();
 			this.chkBoxSelectAll = new System.Windows.Forms.CheckBox();
 			this.btnMerge = new System.Windows.Forms.Button();
-			this.listChangedPaths = new System.Windows.Forms.ListBox();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -72,6 +72,17 @@
 			this.splitContainer1.Size = new System.Drawing.Size(766, 554);
 			this.splitContainer1.SplitterDistance = 277;
 			this.splitContainer1.TabIndex = 8;
+			// 
+			// listChangedPaths
+			// 
+			this.listChangedPaths.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.listChangedPaths.FormattingEnabled = true;
+			this.listChangedPaths.Location = new System.Drawing.Point(-1, -1);
+			this.listChangedPaths.Name = "listChangedPaths";
+			this.listChangedPaths.Size = new System.Drawing.Size(762, 277);
+			this.listChangedPaths.TabIndex = 2;
 			// 
 			// btnOpen
 			// 
@@ -146,14 +157,6 @@
 			this.btnMerge.Text = "Merge Selected";
 			this.btnMerge.UseVisualStyleBackColor = true;
 			this.btnMerge.Click += new System.EventHandler(this.btnMerge_Click);
-			// 
-			// listChangedPaths
-			// 
-			this.listChangedPaths.FormattingEnabled = true;
-			this.listChangedPaths.Location = new System.Drawing.Point(-1, -1);
-			this.listChangedPaths.Name = "listChangedPaths";
-			this.listChangedPaths.Size = new System.Drawing.Size(762, 277);
-			this.listChangedPaths.TabIndex = 2;
 			// 
 			// Form1
 			// 
