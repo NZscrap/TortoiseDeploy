@@ -30,7 +30,9 @@ namespace TortoiseDeploy {
 				}
 			}
 		}
-		private Dictionary<string, string> ProcessingMap;	// Initialized when DeploymentMap is created
+		private Dictionary<string, string> ProcessingMap;   // Initialized when DeploymentMap is created
+
+		public List<DeploymentGroup> DeploymentGroups { get; set; }
 
 		/// <summary>
 		/// Find the relevant destination directory that we should deploy a given input file to.
@@ -75,6 +77,12 @@ namespace TortoiseDeploy {
 
 			// Ensure that we return the path with a trailing seperator character
 			return response.EndsWith(Path.DirectorySeparatorChar.ToString()) ? response : response + Path.DirectorySeparatorChar.ToString();
+		}
+
+		public Config() {
+			DeploymentGroups = new List<DeploymentGroup>();
+			_deploymentMap = new Dictionary<string, string>();
+			ProcessingMap = new Dictionary<string, string>();
 		}
 	}
 }

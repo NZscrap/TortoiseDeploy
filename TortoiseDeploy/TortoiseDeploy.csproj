@@ -51,6 +51,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="DeploymentGroup.cs" />
+    <Compile Include="DeploymentMapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TortoiseDeploy.cs" />
   </ItemGroup>

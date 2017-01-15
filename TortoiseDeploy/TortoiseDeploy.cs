@@ -42,6 +42,38 @@ namespace TortoiseDeploy {
 					this.Ready = false;
 				}
 			}
+
+			//generateConfig();//TODO debug hack
+		}
+
+		private void generateConfig() {
+			// We're going to make a CR UAT group
+			DeploymentGroup crGroup = new DeploymentGroup() {
+				Name = "Mitch testing",
+				PreDeploymentScript = "connectToServer.bat",
+				PreDeploymentArguments = "\\\\crvweb6.estaronline.local",
+				PostDeploymentScript = "recycleSite.bat",
+				PostDeploymentArguments = "\\\\crvweb6.estaronline.local\\websites\\isams_9_countryroad_uat\\website"
+			};
+			DeploymentMapping mapping = new DeploymentMapping() {
+				Source = "C:\\Users\\mitch\\Desktop\\local tortoiseDeploy tests",
+				Destination = "C:\\Users\\mitch\\Desktop\\TortoiseDeploy-Deploy\\svn"
+			};
+			crGroup.DeploymentMappings.Add(mapping);
+			mapping = new DeploymentMapping() {
+				Source = "\\abc.txt",
+				Destination = "C:\\Users\\mitch\\Desktop\\TortoiseDeploy-Deploy\\svn\\gui-abc.txt"
+			};
+			crGroup.DeploymentMappings.Add(mapping);
+
+			config = new Config() {
+				MergeToolPath = "C:\\Program Files (x86)\\Beyond Compare 4\\BCompare.exe",
+				RepositoryRoot = "C:\\Users\\mitch\\Desktop\\local tortoiseDeploy tests"
+			};
+			config.DeploymentGroups.Add(crGroup);
+
+			// Write the config to disk, so we can see what it looks like
+			SaveConfig();
 		}
 
 		/// <summary>
@@ -140,6 +172,43 @@ namespace TortoiseDeploy {
 		/// <param name="message">Message to add to the log file</param>
 		public void LogMessage(string message) {
 			_log.AppendLine(message);
+		}
+
+		/// <summary>
+		/// Write the current config settings to disk.
+		/// </summary>
+		/// <param name="configPath">Path of the config file. If left blank, we'll use config.json in the same folder as the binary.</param>
+		/// <returns>Whether the config was successfully written to disk or not</returns>
+		public bool SaveConfig(string configPath = "") {
+			try {
+				// Use the default config path if we weren't passed one
+				if (String.IsNullOrEmpty(configPath)) {
+					configPath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "config.json");
+				}
+
+				// Backup the old config file, if there is one
+				if (File.Exists(configPath)) {
+					try {
+						if (File.Exists(configPath + ".backup")) {
+							File.Delete(configPath + ".backup");
+						}
+						File.Move(configPath, configPath + ".backup");
+					} catch {
+						return false;
+					}
+				}
+
+				// Write the current config to disk
+				using (StreamWriter writer = new StreamWriter(configPath)) {
+					writer.Write(JsonConvert.SerializeObject(this.config));
+				}
+
+				return true;
+			} catch(Exception ex) {
+				LogMessage("Exception saving config: " + ex.ToString());
+
+				return false;
+			}
 		}
 	}
 }
