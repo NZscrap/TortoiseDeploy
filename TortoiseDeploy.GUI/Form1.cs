@@ -128,6 +128,9 @@ namespace TortoiseDeploy.GUI {
 			this.progressBar.Maximum = getSelected().Count;
 			this.progressBar.Value = 0;
 
+			// Disable the deploy button until the files are deployed
+			this.btnDeploy.Enabled = false;
+
 			// Use the background worker to merge the files
 			this.fileCopyWorker.RunWorkerAsync(getSelected());
 
@@ -188,11 +191,18 @@ namespace TortoiseDeploy.GUI {
 		private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
 			BackgroundWorker worker = sender as BackgroundWorker;
 
-			int percentagePerFile = 100 / ((List<DeploymentDisplay>)e.Argument).Count;
+			// Cast our argument to a list
+			List<DeploymentDisplay> deploymentFiles = ((List<DeploymentDisplay>)e.Argument);
+
+			// Register all of our fiels with the deployer, so that post-deployment scripts can be executed.
+			deployer.RegisterDeploymentFiles(deploymentFiles.Select(df => df.Source).ToList());
+
+			// Figure out the exact percentage, so we can report our progress
+			int percentagePerFile = 100 / deploymentFiles.Count;
 
 			// Copy each file, using the deployer
 			int i = 0;
-			foreach(DeploymentDisplay file in (List<DeploymentDisplay>)e.Argument) {
+			foreach(DeploymentDisplay file in deploymentFiles) {
 				deployer.Deploy(file.Source, file.Destination);
 				worker.ReportProgress(i * percentagePerFile);
 				i++;
@@ -223,6 +233,9 @@ namespace TortoiseDeploy.GUI {
 		private void fileCopyWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
 			// Update the log output
 			OverwriteLog(deployer.Log);
+
+			// Re-enable the Deploy button
+			this.btnDeploy.Enabled = true;
 		}
 	}
 }

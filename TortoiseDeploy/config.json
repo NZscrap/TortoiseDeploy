@@ -5,9 +5,9 @@
     {
       "Name": "Mitch testing",
       "PreDeploymentScript": "preDeployment.bat",
-      "PreDeploymentArguments": "\\\\crvweb6.estaronline.local",
-      "PostDeploymentScript": "recycleSite.bat",
-      "PostDeploymentArguments": "\\\\crvweb6.estaronline.local\\websites\\isams_9_countryroad_uat\\website",
+      "PreDeploymentArguments": "ArgumentPassedIn",
+      "PostDeploymentScript": "postDeployment.bat",
+      "PostDeploymentArguments": "GoRecycleTheWebsite",
       "DeploymentMappings": [
         {
           "Source": "C:\\Users\\mitch\\Desktop\\local tortoiseDeploy tests",

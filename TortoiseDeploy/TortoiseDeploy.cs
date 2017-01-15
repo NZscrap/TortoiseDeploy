@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -12,6 +13,8 @@ namespace TortoiseDeploy {
 		private StringBuilder _log;
 		public string Log { get { return _log.ToString(); } }
 		public Boolean Ready { get; private set; }
+
+		Dictionary<DeploymentGroup, List<string>> registeredDeployments;
 
 		public TortoiseDeploy() : this(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "config.json")) { }
 
@@ -135,6 +138,47 @@ namespace TortoiseDeploy {
 
 				File.Copy(source, destination, true);
 				LogMessage(String.Format("Copied {0} to {1}", source, destination));
+
+				// Remove the file from the list of registered deployment files
+				DeploymentGroup deploymentGroup = config.GetDeploymentGroup(source);
+				if (registeredDeployments != null
+					&& registeredDeployments.ContainsKey(deploymentGroup)
+					&& registeredDeployments[deploymentGroup].Contains(source)) {
+
+					registeredDeployments[deploymentGroup].Remove(source);
+				}
+
+
+				// Run the post-deployment script if we have one configured, and we've deployed all the files registered for that group
+				if (!String.IsNullOrEmpty(group.PostDeploymentScript) 
+					&& !String.IsNullOrEmpty(group.PostDeploymentArguments)
+					&& registeredDeployments != null
+					&& (registeredDeployments.ContainsKey(deploymentGroup) && registeredDeployments[deploymentGroup].Count == 0)) {
+
+					// Check whether the PoseDeploymentScript file exists. If not, we'll try looking in the same folder as our binary
+					if (!File.Exists(group.PostDeploymentScript)) {
+						group.PostDeploymentScript = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), group.PreDeploymentScript);
+
+						// If the PreDeploymentScript file still doesn't exist, log an error and abort. DO NOT COPY THE FILE
+						if (!File.Exists(group.PostDeploymentScript)) {
+							LogMessage("The Post-deployment script cannot be found! Aborted file copy.");
+						}
+					}
+
+					LogMessage(String.Format("Launching Post-deployment script ({0}) with arguments: {1}", group.PostDeploymentScript, group.PostDeploymentArguments));
+
+					// Try to run the script until it's completed before continuing
+					Process postDeploymentScript = Process.Start(group.PostDeploymentScript, group.PostDeploymentArguments);
+					postDeploymentScript.WaitForExit();
+
+					// Check the exit status. As is convention, a status of 0 is a success, anything else is some sort of failure
+					if (postDeploymentScript.ExitCode == 0) {
+						LogMessage("Post-deployment script succeeded");
+					} else {
+						LogMessage("Post-deployment script failed!");
+					}
+				}
+
 				return true;
 			} catch (Exception ex) {
 				LogMessage(String.Format("\nError copying {0} to {1}:\n{2}\n", source, destination, ex.ToString()));
@@ -192,6 +236,29 @@ namespace TortoiseDeploy {
 		/// <returns>Shortened user-friendly path for displaying</returns>
 		public string GetDisplayName(string source) {
 			return source.Substring(source.IndexOf(config.RepositoryRoot) + config.RepositoryRoot.Length + 1);
+		}
+
+		/// <summary>
+		/// Register all the files that will be deployed by this instance.
+		/// This MUST be called for post-deployment scripts to get executed, 
+		/// as we run the post-deployment script after all registered files for a given group have been deployed.
+		/// </summary>
+		/// <param name="deploymentFiles">List of all files that are going to be deployed</param>
+		public void RegisterDeploymentFiles(List<string> deploymentFiles) {
+			// Reset our deployments map
+			registeredDeployments = new Dictionary<DeploymentGroup, List<string>>();
+
+			foreach(string file in deploymentFiles) {
+				DeploymentGroup group = config.GetDeploymentGroup(file);
+
+				// If the map doesn't have an entry for our group yet, create one
+				if (!registeredDeployments.ContainsKey(group)) {
+					registeredDeployments.Add(group, new List<string>());
+				}
+
+				// Add this file to the map
+				registeredDeployments[group].Add(file);
+			}
 		}
 
 		/// <summary>
