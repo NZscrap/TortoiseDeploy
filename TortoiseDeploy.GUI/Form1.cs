@@ -50,7 +50,7 @@ namespace TortoiseDeploy.GUI {
 				// Set the list of files that changed.
 				// If there weren't any, we'll show our usage message
 				if (deploymentMappings.Count > 0) {
-					((ListBox)this.checkListChangedPaths).DataSource = deploymentMappings;
+					((ListBox)this.listChangedPaths).DataSource = deploymentMappings;
 				}
 			} else {
 				// If there were any errors, add them to the deployer log.
@@ -82,7 +82,7 @@ namespace TortoiseDeploy.GUI {
 		private List<DeploymentMapping> getSelected() {
 			List<DeploymentMapping> returnVal = new List<DeploymentMapping>();
 
-			foreach(var selected in this.checkListChangedPaths.CheckedItems) {
+			foreach(var selected in this.listChangedPaths.SelectedItems) {
 				returnVal.Add(this.deploymentMappings.Where(m => m.Display == selected.ToString()).First());
 			}
 
@@ -157,12 +157,12 @@ namespace TortoiseDeploy.GUI {
 		/// <param name="e"></param>
 		private void chkBoxSelectAll_CheckedChanged(object sender, EventArgs e) {
 			if (this.chkBoxSelectAll.Checked) {
-				for(int i = 0; i < this.checkListChangedPaths.Items.Count; i++) {
-					this.checkListChangedPaths.SetItemChecked(i, true);
+				for(int i = 0; i < this.listChangedPaths.Items.Count; i++) {
+					this.listChangedPaths.SetSelected(i, true);
 				}
 			} else {
-				for (int i = 0; i < this.checkListChangedPaths.Items.Count; i++) {
-					this.checkListChangedPaths.SetItemChecked(i, false);
+				for (int i = 0; i < this.listChangedPaths.Items.Count; i++) {
+					this.listChangedPaths.SetSelected(i, false);
 				}
 			}
 		}
