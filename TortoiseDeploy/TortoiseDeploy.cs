@@ -12,7 +12,6 @@ namespace TortoiseDeploy {
 
 		private StringBuilder _log;
 		public string Log { get { return _log.ToString(); } }
-		public Boolean Ready { get; private set; }
 
 		Dictionary<DeploymentGroup, List<string>> registeredDeployments;
 
@@ -27,10 +26,11 @@ namespace TortoiseDeploy {
 			this._log.AppendLine("TortoiseDeploy instance created at " + DateTime.Now.ToString());
 
 			LoadConfig();
-
-			//generateConfig();//TODO debug hack
 		}
 
+		/// <summary>
+		/// Load the config file from disk.
+		/// </summary>
 		public void LoadConfig() {
 			string configPath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "config.json");
 
@@ -38,45 +38,12 @@ namespace TortoiseDeploy {
 			using (StreamReader reader = new StreamReader(configPath)) {
 				try {
 					this.config = JsonConvert.DeserializeObject<Config>(reader.ReadToEnd());
-					this.Ready = true;
 				} catch (Exception ex) {
 
 					_log.AppendLine("Couldn't load config file! Aborting with error:");
 					_log.AppendLine(ex.ToString());
-
-					this.Ready = false;
 				}
 			}
-		}
-
-		private void generateConfig() {
-			// We're going to make a CR UAT group
-			DeploymentGroup crGroup = new DeploymentGroup() {
-				Name = "Mitch testing",
-				PreDeploymentScript = "connectToServer.bat",
-				PreDeploymentArguments = "\\\\crvweb6.estaronline.local",
-				PostDeploymentScript = "recycleSite.bat",
-				PostDeploymentArguments = "\\\\crvweb6.estaronline.local\\websites\\isams_9_countryroad_uat\\website"
-			};
-			DeploymentMapping mapping = new DeploymentMapping() {
-				Source = "C:\\Users\\mitch\\Desktop\\local tortoiseDeploy tests",
-				Destination = "C:\\Users\\mitch\\Desktop\\TortoiseDeploy-Deploy\\svn"
-			};
-			crGroup.DeploymentMappings.Add(mapping);
-			mapping = new DeploymentMapping() {
-				Source = "\\abc.txt",
-				Destination = "C:\\Users\\mitch\\Desktop\\TortoiseDeploy-Deploy\\svn\\gui-abc.txt"
-			};
-			crGroup.DeploymentMappings.Add(mapping);
-
-			config = new Config() {
-				MergeToolPath = "C:\\Program Files (x86)\\Beyond Compare 4\\BCompare.exe",
-				RepositoryRoot = "C:\\Users\\mitch\\Desktop\\local tortoiseDeploy tests"
-			};
-			config.DeploymentGroups.Add(crGroup);
-
-			// Write the config to disk, so we can see what it looks like
-			SaveConfig();
 		}
 
 		/// <summary>
