@@ -16,18 +16,23 @@ namespace TortoiseDeploy {
 
 		Dictionary<DeploymentGroup, List<string>> registeredDeployments;
 
-		public TortoiseDeploy() : this(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "config.json")) { }
-
 		/// <summary>
-		/// Instantiate a new TortoiseDeploy instance from the specified config file.
+		/// Instantiate a new TortoiseDeploy instance from the config file in the binary directory.
 		/// The Ready attribute will be set to show whether the config loaded correctly or not.
 		/// </summary>
-		/// <param name="configPath">Path on disk to a config file that can be deserialized.</param>
-		public TortoiseDeploy(string configPath) {
+		public TortoiseDeploy() {
 			// Instantiate our log object, and log our start time
 			this._log = new StringBuilder();
 			this._log.AppendLine("**********************************************************************");
 			this._log.AppendLine("TortoiseDeploy instance created at " + DateTime.Now.ToString());
+
+			LoadConfig();
+
+			//generateConfig();//TODO debug hack
+		}
+
+		public void LoadConfig() {
+			string configPath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "config.json");
 
 			// Attempt to load the config file
 			using (StreamReader reader = new StreamReader(configPath)) {
@@ -42,8 +47,6 @@ namespace TortoiseDeploy {
 					this.Ready = false;
 				}
 			}
-
-			//generateConfig();//TODO debug hack
 		}
 
 		private void generateConfig() {

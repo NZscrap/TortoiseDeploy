@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,24 +38,7 @@ namespace TortoiseDeploy.GUI {
 
 			// Only do our initial setup if there weren't any errors on startup
 			if (String.IsNullOrEmpty(errors)) {
-				// Identify the longest display name in our list of changed paths
-				int maxPathLength = 0;
-				if (changedPaths.Count > 0) {
-					changedPaths.Max(s => deployer.GetDisplayName(s).Length);
-				}
-
-				// Create a source => destination display string for each file
-				deploymentMappings = new List<DeploymentDisplay>();
-				foreach (string path in changedPaths) {
-					string destination = deployer.GetDeploymentTarget(path);
-					deploymentMappings.Add(new DeploymentDisplay(path, destination));
-				}
-
-				// Set the list of files that changed.
-				// If there weren't any, we'll show our usage message
-				if (deploymentMappings.Count > 0) {
-					((ListBox)this.listChangedPaths).DataSource = deploymentMappings;
-				}
+				LoadDeploymentMappings();
 			} else {
 				// If there were any errors, add them to the deployer log.
 				// This will ensure they're shown in the GUI, and written to the log file.
@@ -63,6 +47,21 @@ namespace TortoiseDeploy.GUI {
 
 			// Update the GUI log box
 			OverwriteLog(deployer.Log);
+		}
+
+		private void LoadDeploymentMappings() {
+			// Create a source => destination display string for each file
+			deploymentMappings = new List<DeploymentDisplay>();
+			foreach (string path in changedPaths) {
+				string destination = deployer.GetDeploymentTarget(path);
+				deploymentMappings.Add(new DeploymentDisplay(path, destination));
+			}
+
+			// Set the list of files that changed.
+			// If there weren't any, we'll show our usage message
+			if (deploymentMappings.Count > 0) {
+				((ListBox)this.listChangedPaths).DataSource = deploymentMappings;
+			}
 		}
 
 		/// <summary>
@@ -236,6 +235,37 @@ namespace TortoiseDeploy.GUI {
 
 			// Re-enable the Deploy button
 			this.btnDeploy.Enabled = true;
+		}
+
+		/// <summary>
+		/// File menu option to exit the application
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void exitToolStripMenuItem_Click(object sender, EventArgs e) {
+			Application.Exit();
+		}
+
+		/// <summary>
+		/// File menu option to open the config file with the default application for .json files
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void openConfigToolStripMenuItem_Click(object sender, EventArgs e) {
+			System.Diagnostics.Process.Start(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "config.json"));
+		}
+
+		/// <summary>
+		/// File menu option to reload the config file from disk, and update the application to use the new config.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void reloadConfigToolStripMenuItem_Click(object sender, EventArgs e) {
+			// Reload the config file from disk
+			deployer.LoadConfig();
+
+			// Reload the deployment mappings
+			this.LoadDeploymentMappings();
 		}
 	}
 }
