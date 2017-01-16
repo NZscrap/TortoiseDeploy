@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Runtime.Serialization;
+using System.Net.Http;
+using Newtonsoft.Json;
 
 namespace TortoiseDeploy {
 	class Config {
 		public string MergeToolPath;
 		public string RepositoryRoot;
+
+		public string RemoteDeploymentGroupURL;
 
 		public List<DeploymentGroup> DeploymentGroups { get; set; }
 
@@ -88,6 +93,69 @@ namespace TortoiseDeploy {
 
 		public Config() {
 			DeploymentGroups = new List<DeploymentGroup>();
+		}
+
+		/// <summary>
+		/// Serialize this config and write it to disk.
+		/// </summary>
+		/// <returns>Whether we successfully saved to disk or not</returns>
+		public bool Save() {
+			try {
+				string configPath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "config.json");
+
+				// Backup the old config file, if there is one
+				if (File.Exists(configPath)) {
+					try {
+						if (File.Exists(configPath + ".backup")) {
+							File.Delete(configPath + ".backup");
+						}
+						File.Move(configPath, configPath + ".backup");
+					} catch (Exception ex) {
+						return false;
+					}
+				}
+
+				// Write the current config to disk
+				using (StreamWriter writer = new StreamWriter(configPath)) {
+					writer.Write(JsonConvert.SerializeObject(this));
+				}
+
+				return true;
+			} catch (Exception ex) {
+				// TODO - log errors
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Load the DeploymentGroups section of our config from the configured remote URL.
+		/// We replace the local DeploymentGroups config with the server version.
+		/// Once loaded from the server, we save the config back to disk.
+		/// Note: This method is called by the serializer once it finishes populating the behaviours.
+		/// </summary>
+		/// <param name="context"></param>
+		[OnDeserialized]
+		public void LoadRemoteDeploymentGroups(StreamingContext context) {
+			// Once we've deserialized the config, check if we have a RemoteDeploymentGroupURL configured
+			if (!String.IsNullOrEmpty(RemoteDeploymentGroupURL)) {
+				try {
+					// Try to connect to the remote url
+					using (HttpClient client = new HttpClient()) {
+						string remoteContent = client.GetAsync(RemoteDeploymentGroupURL).Result.Content.ReadAsStringAsync().Result;
+
+						// If we managed to fetch the remote data, we'll try deserializing it into our config
+						if (!String.IsNullOrEmpty(remoteContent)) {
+							this.DeploymentGroups = JsonConvert.DeserializeObject<List<DeploymentGroup>>(remoteContent);
+
+							// If we've successfully loaded the DeploymentGroups from the remote source, we'll save our config to disk.
+							// This way, if the remote source goes down, we'll still have the info next time we start up
+							this.Save();
+						}
+					}
+				} catch {
+					// TODO - log the exception into our general log file
+				}
+			}
 		}
 	}
 }

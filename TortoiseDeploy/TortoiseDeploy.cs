@@ -34,15 +34,19 @@ namespace TortoiseDeploy {
 		public void LoadConfig() {
 			string configPath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "config.json");
 
-			// Attempt to load the config file
+			// Attempt to read the config file from disk
+			string config;
 			using (StreamReader reader = new StreamReader(configPath)) {
-				try {
-					this.config = JsonConvert.DeserializeObject<Config>(reader.ReadToEnd());
-				} catch (Exception ex) {
+				config = reader.ReadToEnd();
+			}
 
-					_log.AppendLine("Couldn't load config file! Aborting with error:");
-					_log.AppendLine(ex.ToString());
-				}
+			// Try to load the config
+			try {
+				this.config = JsonConvert.DeserializeObject<Config>(config);
+			} catch (Exception ex) {
+
+				_log.AppendLine("Couldn't load config file! Aborting with error:");
+				_log.AppendLine(ex.ToString());
 			}
 		}
 
@@ -244,36 +248,8 @@ namespace TortoiseDeploy {
 		/// </summary>
 		/// <param name="configPath">Path of the config file. If left blank, we'll use config.json in the same folder as the binary.</param>
 		/// <returns>Whether the config was successfully written to disk or not</returns>
-		public bool SaveConfig(string configPath = "") {
-			try {
-				// Use the default config path if we weren't passed one
-				if (String.IsNullOrEmpty(configPath)) {
-					configPath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "config.json");
-				}
-
-				// Backup the old config file, if there is one
-				if (File.Exists(configPath)) {
-					try {
-						if (File.Exists(configPath + ".backup")) {
-							File.Delete(configPath + ".backup");
-						}
-						File.Move(configPath, configPath + ".backup");
-					} catch {
-						return false;
-					}
-				}
-
-				// Write the current config to disk
-				using (StreamWriter writer = new StreamWriter(configPath)) {
-					writer.Write(JsonConvert.SerializeObject(this.config));
-				}
-
-				return true;
-			} catch(Exception ex) {
-				LogMessage("Exception saving config: " + ex.ToString());
-
-				return false;
-			}
+		public bool SaveConfig() {
+			return config.Save();
 		}
 	}
 }

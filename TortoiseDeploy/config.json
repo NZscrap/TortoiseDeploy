@@ -1,27 +1,7 @@
 ﻿{
-	"MergeToolPath" : "C:\\Program Files (x86)\\Beyond Compare 4\\BCompare.exe",
-	"RepositoryRoot" : "C:\\Users\\mitch\\Desktop\\local tortoiseDeploy tests",
-  "DeploymentGroups": [
-    {
-      "Name": "Mitch testing",
-      "PreDeploymentScript": "preDeployment.bat",
-      "PreDeploymentArguments": "ArgumentPassedIn",
-      "PostDeploymentScript": "postDeployment.bat",
-      "PostDeploymentArguments": "GoRecycleTheWebsite.txt",
-      "DeploymentMappings": [
-        {
-          "Source": "C:\\Users\\mitch\\Desktop\\local tortoiseDeploy tests",
-          "Destination": "C:\\Users\\mitch\\Desktop\\TortoiseDeploy-Deploy\\svn",
-          "Display": "C:\\Users\\mitch\\Desktop\\local tortoiseDeploy tests\t->\tC:\\Users\\mitch\\Desktop\\TortoiseDeploy-Deploy\\svn"
-        },
-        {
-          "Source": "C:\\Users\\mitch\\Desktop\\local tortoiseDeploy tests\\abc.txt",
-          "Destination": "C:\\Users\\mitch\\Desktop\\TortoiseDeploy-Deploy\\exact",
-          "Display": "\\abc.txt\t->\tC:\\Users\\mitch\\Desktop\\TortoiseDeploy-Deploy\\exact\\abc.txt"
-        }
-      ]
-    }
-  ],
-	"DeploymentMap" : {}
+  "MergeToolPath": "C:\\Program Files (x86)\\Beyond Compare 4\\BCompare.exe",
+  "RepositoryRoot": "C:\\Users\\mitch\\Desktop\\local tortoiseDeploy tests",
+  "RemoteDeploymentGroupURL": "http://localhost:8000/remote.json",
+  "DeploymentGroups": []
 
 }
