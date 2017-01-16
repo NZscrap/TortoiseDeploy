@@ -21,28 +21,41 @@ namespace TortoiseDeploy {
 
 		/// <summary>
 		/// Find the relevant DeploymentMapping for the specified source file.
+		/// Note: Returns null if we can't find a mapping for this file
 		/// </summary>
 		/// <param name="sourcePath">Local file on disk</param>
 		/// <returns>DeploymentMapping object that specifies where the sourcePath should be deployed.</returns>
 		public DeploymentMapping GetDeploymentMapping(string sourcePath) {
+			DeploymentMapping bestMapping = null;
 			foreach (DeploymentGroup group in DeploymentGroups) {
 				// First we'll check for an exact match on the file source
-				DeploymentMapping exactMatchMapping = group.DeploymentMappings.Where(m => m.Source == sourcePath).FirstOrDefault<DeploymentMapping>();
+				DeploymentMapping exactMatchMapping = group.DeploymentMappings.Where(m => m.Source == sourcePath || this.RepositoryRoot + m.Source == sourcePath).FirstOrDefault<DeploymentMapping>();
 				if (exactMatchMapping != null) {
 					return exactMatchMapping;
 				}
 
 				// If there was no exact match, look for a best-match source
 				foreach (DeploymentMapping mapping in group.DeploymentMappings.OrderByDescending(dm => dm.Source.Length)) {
+					// Our mapping source might be a path relative to the RepositoryRoot. If that's the case, we need to put together the full path before comparing.
+					if (mapping.Source.StartsWith(Path.DirectorySeparatorChar.ToString())) {
+						mapping.Source = this.RepositoryRoot + mapping.Source;
+					}
+
 					// Since we're sorting from the longest path to the shortest, the first match we find is what we want!
 					if (sourcePath.StartsWith(mapping.Source)) {
-						return mapping;
+						// If we haven't mapped anything yet, this is our best mapping
+						if (bestMapping == null) {
+							bestMapping = mapping;
+						} else if (bestMapping.Source.Length < mapping.Source.Length) {
+							// See if the mapping in this group is the most-accurate map so far.
+							bestMapping = mapping;
+						}
 					}
 				}
 			}
 
-			// Return null if we couldn't find a matching DeploymentMapping
-			return null;
+			// Return our best mapping, note that this will be null if we couldn't find a matching DeploymentMapping
+			return bestMapping;
 		}
 
 		/// <summary>
@@ -54,7 +67,7 @@ namespace TortoiseDeploy {
 
 			string response = "";
 			DeploymentMapping mapping = GetDeploymentMapping(sourcePath);
-			
+
 			if (mapping != null && sourcePath.StartsWith(mapping.Source)) {
 				// It's possible that we have further directory nesting.
 				// Eg, Assume sourcePath is ~/Desktop/TortoiseDeploy/config.json, and potentialMatch is ~/Deskop which maps to /var/svn
@@ -68,7 +81,7 @@ namespace TortoiseDeploy {
 				// Our response should be the deployment path that maps to the matched path, plus any postMatch directory structure
 				response = mapping.Destination + Path.DirectorySeparatorChar + postMatch;
 			}
-				
+
 			// Ensure that we return the path with a trailing seperator character (unless the deployment path is empty)
 			return response.EndsWith(Path.DirectorySeparatorChar.ToString()) || String.IsNullOrEmpty(response) ? response : response + Path.DirectorySeparatorChar.ToString();
 		}
