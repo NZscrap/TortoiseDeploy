@@ -22,12 +22,6 @@ namespace TortoiseDeploy.GUI {
 			this.changedPaths = changedPaths;
 			this.errors = errors;
 
-			// DEBUG
-			if (this.changedPaths.Count == 0) {
-				this.changedPaths.Add("C:\\Users\\mitch\\Desktop\\local tortoiseDeploy tests\\abc.txt");
-				this.changedPaths.Add("C:\\Users\\mitch\\Desktop\\local tortoiseDeploy tests\\new.txt");
-			}
-
 			InitializeComponent();
 		}
 
