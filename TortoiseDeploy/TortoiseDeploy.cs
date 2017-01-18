@@ -8,7 +8,7 @@ using System.Text;
 namespace TortoiseDeploy {
 	public class TortoiseDeploy {
 
-		private Config config;
+		public Config config { get; private set; }
 
 		private StringBuilder _log;
 		public string Log { get { return _log.ToString(); } }
@@ -82,32 +82,8 @@ namespace TortoiseDeploy {
 
 				// Run the Pre-deployment step if it hasn't been run yet
 				DeploymentGroup group = config.GetDeploymentGroup(source);
-				if (group != null && !group.PreDeploymentHasRun && !String.IsNullOrEmpty(group.PreDeploymentScript)) {
-					// Check whether the PreDeploymentScript exists. If not, we'll try looking in the same folder as our binary
-					if (!File.Exists(group.PreDeploymentScript)) {
-						group.PreDeploymentScript = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), group.PreDeploymentScript);
-
-						// If the PreDeploymentScript file still doesn't exist, log an error and abort. DO NOT COPY THE FILE
-						if (!File.Exists(group.PreDeploymentScript)) {
-							LogMessage("The Pre-deployment script cannot be found! Aborted file copy.");
-						}
-					}
-
-					LogMessage(String.Format("Launching Pre-deployment script ({0}) with arguments: {1}", group.PreDeploymentScript, group.PreDeploymentArguments));
-
-					// Try to run the script until it's completed before continuing
-					Process preDeploymentScript = Process.Start(group.PreDeploymentScript, group.PreDeploymentArguments);
-					preDeploymentScript.WaitForExit();
-
-					// Check the exit status. As is convention, a status of 0 is a success, anything else is some sort of failure
-					if (preDeploymentScript.ExitCode == 0) {
-						LogMessage("Pre-deployment script succeeded");
-					} else {
-						LogMessage("Pre-deployment script failed!");
-					}
-
-					// Mark our Pre-deployment step as having been run
-					group.PreDeploymentHasRun = true;
+				if (!PreDeploymentStep(group)) {
+					return false;
 				}
 
 				File.Copy(source, destination, true);
@@ -167,6 +143,12 @@ namespace TortoiseDeploy {
 		/// <param name="destination">Path on disk (or network) of second file</param>
 		/// <returns>Whether we successfully launched the merge tool</returns>
 		public bool Merge(string source, string destination) {
+
+			// Run the Pre-deployment step if it hasn't been run yet
+			DeploymentGroup group = config.GetDeploymentGroup(source);
+			if (!PreDeploymentStep(group)) {
+				return false;
+			}
 
 			// Create our arguments for calling the diff tool, ensuring we handle spaces in path names correctly
 			string diffArguments = String.Format("\"{0}\" \"{1}\"", source, destination);
@@ -232,6 +214,49 @@ namespace TortoiseDeploy {
 
 				// Add this file to the map
 				registeredDeployments[group].Add(file);
+			}
+		}
+
+		/// <summary>
+		/// Check whether the Pre-Deployment step has been executed for this group.
+		/// If it hasn't already been run by this TortoiseSVN instance, we will execute it.
+		/// </summary>
+		/// <param name="group">DeploymentGroup to run the PreDeployment step for.</param>
+		/// <returns>True on success (Or deployment step has already run), False if the deployment step had an error</returns>
+		private bool PreDeploymentStep(DeploymentGroup group) {
+			try {
+				// Only proceed if we have a PreDeploymentScript that hasn't been run by this instance of TortoiseDeploy
+				if (group != null && !group.PreDeploymentHasRun && !String.IsNullOrEmpty(group.PreDeploymentScript)) {
+					// Check whether the PreDeploymentScript exists. If not, we'll try looking in the same folder as our binary
+					if (!File.Exists(group.PreDeploymentScript)) {
+						group.PreDeploymentScript = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), group.PreDeploymentScript);
+
+						// If the PreDeploymentScript file still doesn't exist, log an error and abort. DO NOT COPY THE FILE
+						if (!File.Exists(group.PreDeploymentScript)) {
+							LogMessage("The Pre-deployment script cannot be found! Aborted file copy.");
+						}
+					}
+
+					LogMessage(String.Format("Launching Pre-deployment script ({0}) with arguments: {1}", group.PreDeploymentScript, group.PreDeploymentArguments));
+
+					// Try to run the script until it's completed before continuing
+					Process preDeploymentScript = Process.Start(group.PreDeploymentScript, group.PreDeploymentArguments);
+					preDeploymentScript.WaitForExit();
+
+					// Check the exit status. As is convention, a status of 0 is a success, anything else is some sort of failure
+					if (preDeploymentScript.ExitCode == 0) {
+						LogMessage("Pre-deployment script succeeded");
+					} else {
+						LogMessage("Pre-deployment script failed!");
+					}
+
+					// Mark our Pre-deployment step as having been run
+					group.PreDeploymentHasRun = true;
+				}
+				return true;
+			} catch {
+				LogMessage("Error running Pre-deployment script");
+				return false;
 			}
 		}
 

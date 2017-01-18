@@ -9,16 +9,12 @@ namespace TortoiseDeploy.GUI {
 		DeploymentMapping mapping;
 		public string Source { get; private set; }
 		public string Destination { get; private set; }
+		public string Display { get; private set; }
 
-		public string Display {
-			get {
-				return Source + "\t->\t" + Destination;
-			}
-		}
-
-		public DeploymentDisplay(string source, string destination) {
+		public DeploymentDisplay(string source, string destination, string display) {
 			this.Source = source;
 			this.Destination = destination;
+			this.Display = display;
 		}
 
 		public override string ToString() {

@@ -54,7 +54,10 @@ namespace TortoiseDeploy.GUI {
 			deploymentMappings = new List<DeploymentDisplay>();
 			foreach (string path in changedPaths) {
 				string destination = deployer.GetDeploymentTarget(path);
-				deploymentMappings.Add(new DeploymentDisplay(path, destination));
+
+				// Exclude the repository root part of each source file from display
+				string displayPath = String.Format("{0}\t->\t{1}", path.Substring(deployer.config.RepositoryRoot.Length + 1), destination);
+				deploymentMappings.Add(new DeploymentDisplay(path, destination, displayPath));
 			}
 
 			// Set the list of files that changed.

@@ -7,7 +7,7 @@ using System.Net.Http;
 using Newtonsoft.Json;
 
 namespace TortoiseDeploy {
-	class Config {
+	public class Config {
 		public string MergeToolPath;
 		public string RepositoryRoot;
 
