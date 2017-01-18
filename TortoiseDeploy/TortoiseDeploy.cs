@@ -267,14 +267,5 @@ namespace TortoiseDeploy {
 		public void LogMessage(string message) {
 			_log.AppendLine(message);
 		}
-
-		/// <summary>
-		/// Write the current config settings to disk.
-		/// </summary>
-		/// <param name="configPath">Path of the config file. If left blank, we'll use config.json in the same folder as the binary.</param>
-		/// <returns>Whether the config was successfully written to disk or not</returns>
-		public bool SaveConfig() {
-			return config.Save();
-		}
 	}
 }
