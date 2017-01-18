@@ -117,7 +117,7 @@ namespace TortoiseDeploy {
 
 				// Write the current config to disk
 				using (StreamWriter writer = new StreamWriter(configPath)) {
-					writer.Write(JsonConvert.SerializeObject(this));
+					writer.Write(JsonConvert.SerializeObject(this, Formatting.Indented));
 				}
 
 				return true;

@@ -131,7 +131,7 @@ namespace TortoiseDeploy {
 
 					// Check whether the PoseDeploymentScript file exists. If not, we'll try looking in the same folder as our binary
 					if (!File.Exists(group.PostDeploymentScript)) {
-						group.PostDeploymentScript = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), group.PreDeploymentScript);
+						group.PostDeploymentScript = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), group.PostDeploymentScript);
 
 						// If the PreDeploymentScript file still doesn't exist, log an error and abort. DO NOT COPY THE FILE
 						if (!File.Exists(group.PostDeploymentScript)) {
