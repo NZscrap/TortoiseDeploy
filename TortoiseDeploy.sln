@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TortoiseDeploy", "TortoiseDeploy\TortoiseDeploy.csproj", "{DA092E63-9780-4092-95C2-F50F4A3F0984}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TortoiseDeploy.CLI", "TortoiseDeploy.CLI\TortoiseDeploy.CLI.csproj", "{BCEBBB63-F234-491E-8D3E-159CE7295ABB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TortoiseDeploy.GUI", "TortoiseDeploy.GUI\TortoiseDeploy.GUI.csproj", "{8C041D6B-BD70-406E-A1F3-8FAA7A323D5D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{DA092E63-9780-4092-95C2-F50F4A3F0984}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA092E63-9780-4092-95C2-F50F4A3F0984}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA092E63-9780-4092-95C2-F50F4A3F0984}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BCEBBB63-F234-491E-8D3E-159CE7295ABB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BCEBBB63-F234-491E-8D3E-159CE7295ABB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BCEBBB63-F234-491E-8D3E-159CE7295ABB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BCEBBB63-F234-491E-8D3E-159CE7295ABB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C041D6B-BD70-406E-A1F3-8FAA7A323D5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C041D6B-BD70-406E-A1F3-8FAA7A323D5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C041D6B-BD70-406E-A1F3-8FAA7A323D5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C041D6B-BD70-406E-A1F3-8FAA7A323D5D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

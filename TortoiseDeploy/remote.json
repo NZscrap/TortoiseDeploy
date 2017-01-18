@@ -1,0 +1,19 @@
+[
+    {
+      "Name": "Mitch testing",
+      "PreDeploymentScript": "preDeployment.bat",
+      "PreDeploymentArguments": "ArgumentPassedIn",
+      "PostDeploymentScript": "postDeployment.bat",
+      "PostDeploymentArguments": "GoRecycleTheWebsite.txt",
+      "DeploymentMappings": [
+        {
+          "Source": "C:\\Users\\mitch\\Desktop\\local tortoiseDeploy tests",
+          "Destination": "C:\\Users\\mitch\\Desktop\\TortoiseDeploy-Deploy\\svn"
+        },
+        {
+          "Source": "C:\\Users\\mitch\\Desktop\\local tortoiseDeploy tests\\abc.txt",
+          "Destination": "C:\\Users\\mitch\\Desktop\\TortoiseDeploy-Deploy\\exact"
+        }
+      ]
+    }
+  ]
