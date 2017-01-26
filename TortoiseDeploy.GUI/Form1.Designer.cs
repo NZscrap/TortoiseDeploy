@@ -26,7 +26,6 @@
 			this.components = new System.ComponentModel.Container();
 			this.fileCopyWorker = new System.ComponentModel.BackgroundWorker();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-			this.listChangedPaths = new System.Windows.Forms.ListBox();
 			this.btnOpen = new System.Windows.Forms.Button();
 			this.progressBar = new System.Windows.Forms.ProgressBar();
 			this.richTextBox1 = new System.Windows.Forms.RichTextBox();
@@ -35,11 +34,14 @@
 			this.chkBoxSelectAll = new System.Windows.Forms.CheckBox();
 			this.btnMerge = new System.Windows.Forms.Button();
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.openConfigToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.reloadConfigToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.lvChangedPaths = new System.Windows.Forms.ListView();
+			this.Source = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.Destination = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -66,7 +68,7 @@
 			// 
 			// splitContainer1.Panel1
 			// 
-			this.splitContainer1.Panel1.Controls.Add(this.listChangedPaths);
+			this.splitContainer1.Panel1.Controls.Add(this.lvChangedPaths);
 			// 
 			// splitContainer1.Panel2
 			// 
@@ -80,18 +82,6 @@
 			this.splitContainer1.Size = new System.Drawing.Size(766, 527);
 			this.splitContainer1.SplitterDistance = 263;
 			this.splitContainer1.TabIndex = 8;
-			// 
-			// listChangedPaths
-			// 
-			this.listChangedPaths.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.listChangedPaths.FormattingEnabled = true;
-			this.listChangedPaths.Location = new System.Drawing.Point(-1, -1);
-			this.listChangedPaths.Name = "listChangedPaths";
-			this.listChangedPaths.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listChangedPaths.Size = new System.Drawing.Size(762, 251);
-			this.listChangedPaths.TabIndex = 2;
 			// 
 			// btnOpen
 			// 
@@ -149,6 +139,8 @@
 			// chkBoxSelectAll
 			// 
 			this.chkBoxSelectAll.AutoSize = true;
+			this.chkBoxSelectAll.Checked = true;
+			this.chkBoxSelectAll.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.chkBoxSelectAll.Location = new System.Drawing.Point(12, 3);
 			this.chkBoxSelectAll.Name = "chkBoxSelectAll";
 			this.chkBoxSelectAll.Size = new System.Drawing.Size(107, 17);
@@ -177,11 +169,6 @@
 			this.menuStrip1.TabIndex = 9;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
-			// contextMenuStrip1
-			// 
-			this.contextMenuStrip1.Name = "contextMenuStrip1";
-			this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
-			// 
 			// fileToolStripMenuItem
 			// 
 			this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -195,23 +182,54 @@
 			// openConfigToolStripMenuItem
 			// 
 			this.openConfigToolStripMenuItem.Name = "openConfigToolStripMenuItem";
-			this.openConfigToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.openConfigToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
 			this.openConfigToolStripMenuItem.Text = "Edit Config";
 			this.openConfigToolStripMenuItem.Click += new System.EventHandler(this.openConfigToolStripMenuItem_Click);
 			// 
 			// reloadConfigToolStripMenuItem
 			// 
 			this.reloadConfigToolStripMenuItem.Name = "reloadConfigToolStripMenuItem";
-			this.reloadConfigToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.reloadConfigToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
 			this.reloadConfigToolStripMenuItem.Text = "Reload Config";
 			this.reloadConfigToolStripMenuItem.Click += new System.EventHandler(this.reloadConfigToolStripMenuItem_Click);
 			// 
 			// exitToolStripMenuItem
 			// 
 			this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-			this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.exitToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
 			this.exitToolStripMenuItem.Text = "Exit";
 			this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+			// 
+			// contextMenuStrip1
+			// 
+			this.contextMenuStrip1.Name = "contextMenuStrip1";
+			this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
+			// 
+			// lvChangedPaths
+			// 
+			this.lvChangedPaths.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.lvChangedPaths.CheckBoxes = true;
+			this.lvChangedPaths.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.Source,
+            this.Destination});
+			this.lvChangedPaths.Location = new System.Drawing.Point(3, 3);
+			this.lvChangedPaths.Name = "lvChangedPaths";
+			this.lvChangedPaths.Size = new System.Drawing.Size(758, 247);
+			this.lvChangedPaths.TabIndex = 3;
+			this.lvChangedPaths.UseCompatibleStateImageBehavior = false;
+			this.lvChangedPaths.View = System.Windows.Forms.View.Details;
+			// 
+			// Source
+			// 
+			this.Source.Text = "Source";
+			this.Source.Width = 200;
+			// 
+			// Destination
+			// 
+			this.Destination.Text = "Destination";
+			this.Destination.Width = 554;
 			// 
 			// Form1
 			// 
@@ -224,6 +242,7 @@
 			this.Name = "Form1";
 			this.Text = "TortoiseDeploy";
 			this.Load += new System.EventHandler(this.Form1_Load);
+			this.ResizeEnd += new System.EventHandler(this.Form1_ResizeEnd);
 			this.splitContainer1.Panel1.ResumeLayout(false);
 			this.splitContainer1.Panel2.ResumeLayout(false);
 			this.splitContainer1.Panel2.PerformLayout();
@@ -246,13 +265,15 @@
 		private System.Windows.Forms.Button btnDeploy;
 		private System.Windows.Forms.CheckBox chkBoxSelectAll;
 		private System.Windows.Forms.Button btnMerge;
-		private System.Windows.Forms.ListBox listChangedPaths;
 		private System.Windows.Forms.MenuStrip menuStrip1;
 		private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem openConfigToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem reloadConfigToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
 		private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+		private System.Windows.Forms.ListView lvChangedPaths;
+		private System.Windows.Forms.ColumnHeader Source;
+		private System.Windows.Forms.ColumnHeader Destination;
 	}
 }
 

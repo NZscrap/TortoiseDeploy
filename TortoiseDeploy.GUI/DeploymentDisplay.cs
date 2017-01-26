@@ -6,19 +6,16 @@ using System.Threading.Tasks;
 
 namespace TortoiseDeploy.GUI {
 	class DeploymentDisplay {
-		DeploymentMapping mapping;
 		public string Source { get; private set; }
 		public string Destination { get; private set; }
-		public string Display { get; private set; }
 
-		public DeploymentDisplay(string source, string destination, string display) {
+		public DeploymentDisplay(string source, string destination) {
 			this.Source = source;
 			this.Destination = destination;
-			this.Display = display;
 		}
 
 		public override string ToString() {
-			return Display;
+			return Source;
 		}
 	}
 }

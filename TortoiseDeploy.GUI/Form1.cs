@@ -49,16 +49,17 @@ namespace TortoiseDeploy.GUI {
 			foreach (string path in changedPaths) {
 				string destination = deployer.GetDeploymentTarget(path);
 
-				// Exclude the repository root part of each source file from display
-				string displayPath = String.Format("{0}\t->\t{1}", path.Substring(deployer.config.RepositoryRoot.Length + 1), destination);
-				deploymentMappings.Add(new DeploymentDisplay(path, destination, displayPath));
+				// Create our display object
+				deploymentMappings.Add(new DeploymentDisplay(path, destination));
 			}
 
-			// Set the list of files that changed.
-			// If there weren't any, we'll show our usage message
-			if (deploymentMappings.Count > 0) {
-				((ListBox)this.listChangedPaths).DataSource = deploymentMappings;
+			// Populate the list of files that changed.
+			foreach(var i in deploymentMappings) {
+				ListViewItem entry = new ListViewItem(new string[] { i.Source, i.Destination });
+				entry.Checked = true;
+				this.lvChangedPaths.Items.Add(entry);
 			}
+			resizeListView();
 		}
 
 		/// <summary>
@@ -81,8 +82,8 @@ namespace TortoiseDeploy.GUI {
 		private List<DeploymentDisplay> getSelected() {
 			List<DeploymentDisplay> returnVal = new List<DeploymentDisplay>();
 
-			foreach(var selected in this.listChangedPaths.SelectedItems) {
-				returnVal.Add(this.deploymentMappings.Where(m => m.Display == selected.ToString()).First());
+			foreach(var selected in this.lvChangedPaths.CheckedItems) {
+				returnVal.Add(this.deploymentMappings.Where(m => m.Source == ((ListViewItem)selected).Text).First());
 			}
 
 			return returnVal;
@@ -158,14 +159,8 @@ namespace TortoiseDeploy.GUI {
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void chkBoxSelectAll_CheckedChanged(object sender, EventArgs e) {
-			if (this.chkBoxSelectAll.Checked) {
-				for(int i = 0; i < this.listChangedPaths.Items.Count; i++) {
-					this.listChangedPaths.SetSelected(i, true);
-				}
-			} else {
-				for (int i = 0; i < this.listChangedPaths.Items.Count; i++) {
-					this.listChangedPaths.SetSelected(i, false);
-				}
+			foreach(ListViewItem item in this.lvChangedPaths.Items) {
+				item.Checked = this.chkBoxSelectAll.Checked;
 			}
 		}
 
@@ -263,6 +258,27 @@ namespace TortoiseDeploy.GUI {
 
 			// Reload the deployment mappings
 			this.LoadDeploymentMappings();
+		}
+
+		/// <summary>
+		/// Called whenever the form is resized.
+		/// We call off to the resizeListView method, to resize the columns.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void Form1_ResizeEnd(object sender, EventArgs e) {
+			resizeListView();
+		}
+
+		/// <summary>
+		/// Resize the columns in the ListView to match their content.
+		/// </summary>
+		private void resizeListView() {
+			// Ensure the list of changed paths resizes appropriately
+			for (int i = 0; i < this.lvChangedPaths.Columns.Count - 1; i++) {
+				this.lvChangedPaths.AutoResizeColumn(i, ColumnHeaderAutoResizeStyle.ColumnContent);
+			}
+			this.lvChangedPaths.Columns[this.lvChangedPaths.Columns.Count - 1].Width = -2;	// -2 is a magic number that tells the last column to use all remaining space
 		}
 	}
 }
