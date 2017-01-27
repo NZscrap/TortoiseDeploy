@@ -58,9 +58,18 @@ namespace TortoiseDeploy.GUI {
 			}
 
 			// Populate the list of files that changed.
-			foreach(var i in deploymentMappings) {
-				ListViewItem entry = new ListViewItem(new string[] { i.DisplaySource, i.Destination });
+			foreach(DeploymentDisplay deploymentMapping in deploymentMappings) {
+				ListViewItem entry = new ListViewItem(new string[] { deploymentMapping.DisplaySource, deploymentMapping.Destination });
 				entry.Checked = true;
+				// Register a callback for when the file has been deployed. Once the file is deployed, we'll change it's colour to green.
+				deploymentMapping.registerIsDeployedCallback((dd) => {
+					if (dd.IsDeployed) {
+						entry.ForeColor = Color.Green;
+					} else {
+						entry.ForeColor = Color.Black;
+					}
+				});
+
 				this.lvChangedPaths.Items.Add(entry);
 			}
 			resizeListView();
@@ -199,6 +208,7 @@ namespace TortoiseDeploy.GUI {
 			int i = 0;
 			foreach(DeploymentDisplay file in deploymentFiles) {
 				deployer.Deploy(file.Source, file.Destination);
+				file.IsDeployed = true;
 				worker.ReportProgress(i * percentagePerFile);
 				i++;
 			}
