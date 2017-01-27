@@ -42,6 +42,7 @@
 			this.lvChangedPaths = new System.Windows.Forms.ListView();
 			this.Source = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.Destination = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.lblItemsSelected = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -72,6 +73,7 @@
 			// 
 			// splitContainer1.Panel2
 			// 
+			this.splitContainer1.Panel2.Controls.Add(this.lblItemsSelected);
 			this.splitContainer1.Panel2.Controls.Add(this.btnOpen);
 			this.splitContainer1.Panel2.Controls.Add(this.progressBar);
 			this.splitContainer1.Panel2.Controls.Add(this.richTextBox1);
@@ -97,9 +99,9 @@
 			// 
 			this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.progressBar.Location = new System.Drawing.Point(125, 3);
+			this.progressBar.Location = new System.Drawing.Point(243, 3);
 			this.progressBar.Name = "progressBar";
-			this.progressBar.Size = new System.Drawing.Size(628, 17);
+			this.progressBar.Size = new System.Drawing.Size(510, 17);
 			this.progressBar.TabIndex = 13;
 			// 
 			// richTextBox1
@@ -220,6 +222,7 @@
 			this.lvChangedPaths.TabIndex = 3;
 			this.lvChangedPaths.UseCompatibleStateImageBehavior = false;
 			this.lvChangedPaths.View = System.Windows.Forms.View.Details;
+			this.lvChangedPaths.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.lvChangedPaths_ItemChecked);
 			// 
 			// Source
 			// 
@@ -230,6 +233,15 @@
 			// 
 			this.Destination.Text = "Destination";
 			this.Destination.Width = 554;
+			// 
+			// lblItemsSelected
+			// 
+			this.lblItemsSelected.AutoSize = true;
+			this.lblItemsSelected.Location = new System.Drawing.Point(125, 4);
+			this.lblItemsSelected.Name = "lblItemsSelected";
+			this.lblItemsSelected.Size = new System.Drawing.Size(112, 13);
+			this.lblItemsSelected.TabIndex = 15;
+			this.lblItemsSelected.Text = "100/300 files selected";
 			// 
 			// Form1
 			// 
@@ -274,6 +286,7 @@
 		private System.Windows.Forms.ListView lvChangedPaths;
 		private System.Windows.Forms.ColumnHeader Source;
 		private System.Windows.Forms.ColumnHeader Destination;
+		private System.Windows.Forms.Label lblItemsSelected;
 	}
 }
 

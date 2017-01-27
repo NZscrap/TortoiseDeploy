@@ -284,5 +284,15 @@ namespace TortoiseDeploy.GUI {
 			}
 			this.lvChangedPaths.Columns[this.lvChangedPaths.Columns.Count - 1].Width = -2;	// -2 is a magic number that tells the last column to use all remaining space
 		}
+
+		/// <summary>
+		/// Called whenever an item in the listview is checked or unchecked.
+		/// This callback just updates our count of selected files.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void lvChangedPaths_ItemChecked(object sender, ItemCheckedEventArgs e) {
+			lblItemsSelected.Text = string.Format("{0} / {1} files selected", lvChangedPaths.CheckedItems.Count, lvChangedPaths.Items.Count);
+		}
 	}
 }
