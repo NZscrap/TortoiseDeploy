@@ -49,13 +49,17 @@ namespace TortoiseDeploy.GUI {
 			foreach (string path in changedPaths) {
 				string destination = deployer.GetDeploymentTarget(path);
 
+				// Don't display the full path for source items, just use the path relative to the repo root.
+				// This helps make the source column in the GUI a bit smaller
+				string sourcePath = path.Substring(deployer.config.RepositoryRoot.Length);
+
 				// Create our display object
-				deploymentMappings.Add(new DeploymentDisplay(path, destination));
+				deploymentMappings.Add(new DeploymentDisplay(path, destination, sourcePath));
 			}
 
 			// Populate the list of files that changed.
 			foreach(var i in deploymentMappings) {
-				ListViewItem entry = new ListViewItem(new string[] { i.Source, i.Destination });
+				ListViewItem entry = new ListViewItem(new string[] { i.DisplaySource, i.Destination });
 				entry.Checked = true;
 				this.lvChangedPaths.Items.Add(entry);
 			}
@@ -83,7 +87,7 @@ namespace TortoiseDeploy.GUI {
 			List<DeploymentDisplay> returnVal = new List<DeploymentDisplay>();
 
 			foreach(var selected in this.lvChangedPaths.CheckedItems) {
-				returnVal.Add(this.deploymentMappings.Where(m => m.Source == ((ListViewItem)selected).Text).First());
+				returnVal.Add(this.deploymentMappings.Where(m => m.DisplaySource == ((ListViewItem)selected).Text).First());
 			}
 
 			return returnVal;
