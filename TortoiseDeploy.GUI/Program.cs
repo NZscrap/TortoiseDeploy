@@ -35,10 +35,7 @@ namespace TortoiseDeploy.GUI {
 					using (StreamReader reader = new StreamReader(args[4])) {
 						// If the file actually has contents, we want to exit early.
 						if (!reader.EndOfStream) {
-							errors.AppendLine("An error occurred during the commit operation:");
-							errors.AppendLine("-----------------------------------------------");
-							errors.Append(reader.ReadToEnd());
-							errors.AppendLine("-----------------------------------------------");
+							Application.Exit();
 						}
 					}
 				} catch { }
